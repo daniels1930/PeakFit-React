@@ -24,3 +24,49 @@ input {
 img {
   max-width: 100%;
 }
+
+.page-workspace {
+  padding: 72px 60px;
+}
+
+.page-workspace h1 {
+  margin: 8px 0 16px;
+  font-family: "Bayon", Arial, sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 100;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.page-workspace p {
+  max-width: 720px;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.page-kicker {
+  color: #d0ff00;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.page-action {
+  display: inline-flex;
+  margin-top: 24px;
+  color: #0a0a0a;
+  background: #d0ff00;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-family: "Poppins", Arial, sans-serif;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .page-workspace {
+    padding: 48px 20px;
+  }
+}

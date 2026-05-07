@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { products } from "../../data/products";
 import "./Products.css";
 
@@ -37,10 +38,10 @@ function ProductGrid({ products }: ProductGridProps) {
     <div className="grid">
       {products.map((product) => (
         <article className="product-card" key={product.name}>
-          <div className="img-container">
+          <Link className="img-container" to={`/products/${product.id}`} aria-label={`View ${product.name}`}>
             <img className="img1" src={product.imagePrimary} alt={product.name} />
             <img className="img2" src={product.imageSecondary} alt="" />
-          </div>
+          </Link>
 
           <div className="info">
             <p className="nombre">{product.name}</p>

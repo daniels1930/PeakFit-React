@@ -1,0 +1,15 @@
+.product-detail-page {
+  min-height: 70vh;
+  background: radial-gradient(circle at top left, #270149, #0a0a0a 55%);
+}
+
+.product-detail-price {
+  color: #d0ff00;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.product-detail-image {
+  width: min(360px, 100%);
+  margin-top: 24px;
+}
