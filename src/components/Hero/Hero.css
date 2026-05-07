@@ -1,0 +1,248 @@
+@import url("https://fonts.googleapis.com/css2?family=Bayon&family=Jost:ital,wght@1,400&family=Poppins:wght@600&display=swap");
+
+.hero-top-banner {
+  background: #d0ff00;
+  text-align: center;
+  padding: 4px;
+  font-family: "Jost", sans-serif;
+  font-style: italic;
+  font-size: 26px;
+  color: #0a0a0a;
+  letter-spacing: 1px;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  background: linear-gradient(to bottom, #270149 0%, #0a0a0a 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.hero-bg-logo {
+  position: absolute;
+  right: 150px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  z-index: 1;
+}
+
+.hero-atleta {
+  position: absolute;
+  right: 80px;
+  bottom: 0;
+  height: 95%;
+  z-index: 2;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 0 60px;
+}
+
+.hero-aspire {
+  font-family: "Bayon", sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.hero-titulo {
+  font-family: "Bayon", sans-serif;
+  font-size: 100px;
+  color: white;
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 0 0 40px;
+  letter-spacing: 2px;
+  font-weight: 100;
+}
+
+.hero-titulo span {
+  color: #d0ff00;
+}
+
+.hero-btn {
+  background: #d0ff00;
+  border: none;
+  padding: 20px 40px;
+  font-family: "Poppins", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0a0a0a;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-btn:hover {
+  background: white;
+}
+
+.hero-btn-flecha {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.hero-dots {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  z-index: 4;
+}
+
+.hero-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: none;
+  cursor: pointer;
+}
+
+.hero-dot.active {
+  background: white;
+}
+
+.hero-bottom-banner {
+  background: #d0ff00;
+  padding: 14px;
+  text-align: center;
+  font-family: "Bayon", sans-serif;
+  font-size: 36px;
+  color: #0a0a0a;
+  letter-spacing: 30px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1024px) {
+  .hero {
+    height: 80vh;
+    min-height: 560px;
+  }
+
+  .hero-bg-logo {
+    right: 60px;
+    height: 50%;
+  }
+
+  .hero-atleta {
+    right: 20px;
+    height: 80%;
+  }
+
+  .hero-content {
+    padding: 0 40px;
+    max-width: 55%;
+  }
+
+  .hero-titulo {
+    font-size: 72px;
+  }
+
+  .hero-btn {
+    padding: 16px 28px;
+    font-size: 17px;
+  }
+
+  .hero-bottom-banner {
+    font-size: 28px;
+    letter-spacing: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-top-banner {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+
+  .hero {
+    height: 100svh;
+    min-height: 600px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .hero-bg-logo {
+    top: 18%;
+    right: 50%;
+    transform: translateX(50%);
+    height: 38%;
+  }
+
+  .hero-atleta {
+    top: 8%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 55%;
+    object-fit: contain;
+    object-position: bottom center;
+  }
+
+  .hero-content {
+    position: absolute;
+    bottom: 90px;
+    left: 0;
+    right: 0;
+    padding: 0 28px;
+    max-width: 100%;
+  }
+
+  .hero-aspire {
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+
+  .hero-titulo {
+    font-size: 44px;
+    line-height: 0.93;
+    margin-bottom: 24px;
+  }
+
+  .hero-btn {
+    padding: 16px 28px;
+    font-size: 15px;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-btn-flecha {
+    width: 26px;
+    height: 26px;
+  }
+
+  .hero-dots {
+    bottom: 36px;
+    gap: 10px;
+  }
+
+  .hero-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hero-bottom-banner {
+    font-size: 14px;
+    letter-spacing: 6px;
+    padding: 12px 16px;
+  }
+}

@@ -1,0 +1,178 @@
+/* header.css - migrated from the original PeakFit home */
+.header {
+  background-color: #121212;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 60px;
+  gap: 10px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 200px;
+  height: auto;
+}
+
+.search-box {
+  flex: 0.9;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 9px 14px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+}
+
+.search-box button {
+  background: white;
+  border: none;
+  border-left: 1px solid #ccc;
+  padding: 9px 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.search-box button img {
+  width: 22px;
+  height: 22px;
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.icons img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.bottom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 32px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a,
+.user-info,
+.my-products {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.nav-links a:hover,
+.user-info:hover,
+.my-products:hover {
+  color: white;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+}
+
+.user-info img {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 1024px) {
+  .top-header {
+    flex-wrap: wrap;
+    padding: 14px 40px;
+  }
+
+  .logo img {
+    width: 150px;
+  }
+
+  .search-box {
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .icons img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .bottom-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 40px;
+    gap: 10px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    padding: 10px 16px;
+  }
+
+  .logo img {
+    width: 80px;
+  }
+
+  .icons {
+    gap: 12px;
+  }
+
+  .icons img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .bottom-header {
+    padding: 10px 16px;
+  }
+
+  .nav-links {
+    gap: 12px;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+  }
+}

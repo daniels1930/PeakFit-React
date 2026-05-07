@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Bayon&family=Jost:ital,wght@0,400;1,400&family=Poppins:wght@400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: #0a0a0a;
+  color: white;
+  font-family: "Jost", Arial, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+}

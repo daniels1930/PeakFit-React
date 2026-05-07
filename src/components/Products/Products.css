@@ -1,0 +1,215 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Bayon&display=swap");
+
+.productos {
+  padding: 60px;
+}
+
+.titulo {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.img-container {
+  position: relative;
+}
+
+.img1,
+.img2 {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.img2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.product-card:hover .img2 {
+  opacity: 1;
+}
+
+.product-card:hover .img1 {
+  opacity: 0;
+}
+
+.info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: black;
+  padding: 8px 44px 8px 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  box-sizing: border-box;
+}
+
+.product-card:hover .info {
+  opacity: 1;
+}
+
+.nombre,
+.precio {
+  font-size: 13px;
+}
+
+.precio {
+  color: #ccff00;
+}
+
+.icono {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.icono img {
+  width: 35px;
+  height: auto;
+  display: block;
+}
+
+.view-all {
+  display: block;
+  margin: 60px auto;
+  color: white;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+  font: inherit;
+}
+
+.view-all:hover {
+  color: #6a8306;
+  scale: 1.05;
+}
+
+.banner {
+  background: #ccff00;
+  color: black;
+  text-align: center;
+  padding: 20px;
+  font-family: "Bayon", sans-serif;
+  letter-spacing: 6px;
+  margin-top: 40px;
+  font-size: 40px;
+}
+
+.productos-hero {
+  position: relative;
+  margin-top: 0;
+}
+
+.productos-hero img {
+  width: 100vw;
+  height: auto;
+  display: block;
+}
+
+.banner,
+.productos-hero {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+@media (max-width: 1024px) {
+  .productos {
+    padding: 40px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .img1,
+  .img2 {
+    height: 320px;
+  }
+
+  .titulo {
+    font-size: 28px;
+  }
+
+  .banner {
+    font-size: 24px;
+    letter-spacing: 5px;
+  }
+
+  .icono img {
+    width: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .productos {
+    padding: 16px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .img1,
+  .img2 {
+    height: 200px;
+  }
+
+  .titulo {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .view-all {
+    font-size: 13px;
+    margin: 30px auto;
+  }
+
+  .banner {
+    font-size: 16px;
+    letter-spacing: 3px;
+    padding: 10px;
+  }
+
+  .icono {
+    bottom: 8px;
+    right: 8px;
+  }
+
+  .icono img {
+    width: 24px;
+  }
+
+  .info {
+    padding: 6px 36px 6px 6px;
+  }
+
+  .nombre,
+  .precio {
+    font-size: 11px;
+  }
+}
