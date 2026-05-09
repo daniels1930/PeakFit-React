@@ -1,12 +1,9 @@
-/* ── WomenCollection.css ─────────────────────────────────── */
-
 .wc-page {
   background: #0a0a0a;
   color: white;
   font-family: "Poppins", Arial, sans-serif;
 }
 
-/* ── Hero ──────────────────────────────────────────────────── */
 .wc-hero {
   position: relative;
   width: 100%;
@@ -18,12 +15,11 @@
   align-items: center;
 }
 
-/* imagen bajada para no ver el corte */
 .wc-hero-img {
   position: absolute;
   right: 40px;
-  bottom: -60px;          /* baja la imagen */
-  height: 110%;           /* un poco más grande para cubrir */
+  bottom: -60px;
+  height: 110%;
   width: auto;
   object-fit: cover;
   object-position: top center;
@@ -143,19 +139,17 @@
   background: #d0ff00;
 }
 
-/* ── Products section ─────────────────────────────────────── */
 .wc-products {
-  /* sin padding horizontal aquí para que la barra sea full width */
+
   padding: 0;
 }
 
-/* barra verde — full ancho de pantalla */
 .wc-filter-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #d0ff00;
-  padding: 14px 60px;      /* padding solo interno */
+  padding: 14px 60px;
   width: 100%;
   flex-wrap: wrap;
   gap: 12px;
@@ -200,12 +194,10 @@
   text-underline-offset: 4px;
 }
 
-/* wrapper con padding para el grid */
 .wc-grid-wrap {
   padding: 40px 60px 80px;
 }
 
-/* ── Grid ─────────────────────────────────────────────────── */
 .wc-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -213,7 +205,6 @@
   margin-bottom: 48px;
 }
 
-/* ── Card ─────────────────────────────────────────────────── */
 .wc-card {
   display: flex;
   flex-direction: column;
@@ -282,7 +273,6 @@
   object-fit: contain;
 }
 
-/* hover overlay: flechas + shop now — solo al pasar el mouse */
 .wc-card-hover {
   position: absolute;
   inset: 0;
@@ -300,7 +290,6 @@
   pointer-events: auto;
 }
 
-/* flechas en el centro vertical */
 .wc-card-hover-arrows {
   display: flex;
   align-items: center;
@@ -309,7 +298,6 @@
   flex: 1;
 }
 
-/* shop now pegado al fondo */
 .wc-card-hover-bottom {
   display: flex;
 }
@@ -336,7 +324,6 @@
   color: #0a0a0a;
 }
 
-/* shop now en el centro del hover */
 .wc-shop-now {
   background: #d0ff00;
   border: none;
@@ -355,7 +342,6 @@
   background: white;
 }
 
-/* card info */
 .wc-card-info {
   padding: 10px 4px 4px;
 }
@@ -376,7 +362,6 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* ── Pagination ───────────────────────────────────────────── */
 .wc-pagination {
   display: flex;
   align-items: center;
@@ -416,26 +401,6 @@
   padding: 0 4px;
 }
 
-.wc-view-all {
-  display: block;
-  margin: 0 auto;
-  background: transparent;
-  border: none;
-  color: white;
-  font-family: "Poppins", Arial, sans-serif;
-  font-size: 15px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
-  padding: 8px;
-  transition: color 0.15s;
-}
-
-.wc-view-all:hover {
-  color: #d0ff00;
-}
-
-/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .wc-grid {
     grid-template-columns: repeat(3, 1fr);

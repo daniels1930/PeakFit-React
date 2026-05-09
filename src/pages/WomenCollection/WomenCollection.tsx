@@ -9,8 +9,6 @@ const heroSlides = [
 ];
 
 type FilterTab = "all" | "clothing" | "accessories" | "supplements";
-
-// ── Card ─────────────────────────────────────────────────────
 function ProductCard({ product }: { product: typeof womenProducts[0] }) {
   const [imgIndex, setImgIndex] = useState(0);
   const [liked, setLiked] = useState(false);
@@ -54,8 +52,6 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
             alt={liked ? "Remove from wishlist" : "Add to wishlist"}
           />
         </button>
-
-        {/* hover overlay: flechas + shop now */}
         <div className={`wc-card-hover${hovered ? " visible" : ""}`}>
           <div className="wc-card-hover-arrows">
             <button className="wc-arrow" type="button" onClick={prev} aria-label="Previous image">‹</button>
@@ -74,8 +70,6 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
     </article>
   );
 }
-
-// ── Page ──────────────────────────────────────────────────────
 function WomenCollection() {
   const [heroSlide, setHeroSlide] = useState(0);
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
@@ -92,7 +86,6 @@ function WomenCollection() {
 
   return (
     <main className="wc-page">
-      {/* Hero */}
       <section className="wc-hero">
         <img className="wc-hero-img" src={heroSlides[heroSlide].image} alt="" />
         <div className="wc-hero-overlay" />
@@ -128,11 +121,7 @@ function WomenCollection() {
           ))}
         </div>
       </section>
-
-      {/* Products */}
       <section ref={productsRef} className="wc-products" id="wc-products">
-
-        {/* barra verde full ancho */}
         <div className="wc-filter-bar">
           <h2 className="wc-filter-title">WOMEN'S PRODUCTS</h2>
           <div className="wc-tabs">
@@ -148,16 +137,12 @@ function WomenCollection() {
             ))}
           </div>
         </div>
-
-        {/* grid con padding lateral */}
         <div className="wc-grid-wrap">
           <div className="wc-grid">
             {filtered.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-
-          <button className="wc-view-all" type="button">View all</button>
         </div>
       </section>
     </main>
