@@ -4,8 +4,8 @@ import "./Collections.css";
 const collections = [
   { title: "Men", image: "/assets/images/footer/Men.jpg", to: "/collections/men" },
   { title: "Woman", image: "/assets/images/footer/Woman.jpg", to: "/collections/women" },
-  { title: "Accessories", image: "/assets/images/footer/accessories.jpg", to: null },
-  { title: "Equipment", image: "/assets/images/footer/equipment.jpg", to: null },
+  { title: "Accessories", image: "/assets/images/footer/accessories.jpg", to: "/categories/accessories" },
+  { title: "Equipment", image: "/assets/images/footer/equipment.jpg", to: "/categories/equipment" },
 ];
 
 function Collections() {

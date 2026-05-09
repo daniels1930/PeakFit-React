@@ -42,6 +42,7 @@ function AppRouter() {
         <Route path="/collections/men" element={<MenCollection />} />
         <Route path="/products/:productId" element={<ProductDetail />} />
         <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/:categorySlug" element={<Categories />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

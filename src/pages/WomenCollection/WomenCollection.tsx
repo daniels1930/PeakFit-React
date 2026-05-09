@@ -9,6 +9,13 @@ const heroSlides = [
 ];
 
 type FilterTab = "all" | "clothing" | "accessories" | "supplements";
+
+const emptyMessages: Record<Exclude<FilterTab, "all">, string> = {
+  clothing: "No clothing available for women yet.",
+  accessories: "No accessories available for women yet.",
+  supplements: "No supplements available for women yet.",
+};
+
 function ProductCard({ product }: { product: typeof womenProducts[0] }) {
   const [imgIndex, setImgIndex] = useState(0);
   const [liked, setLiked] = useState(false);
@@ -79,6 +86,8 @@ function WomenCollection() {
     activeTab === "all"
       ? womenProducts
       : womenProducts.filter((p) => p.category === activeTab);
+  const emptyMessage =
+    activeTab === "all" ? "No products available for women yet." : emptyMessages[activeTab];
 
   const scrollToProducts = () => {
     productsRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -138,11 +147,19 @@ function WomenCollection() {
           </div>
         </div>
         <div className="wc-grid-wrap">
-          <div className="wc-grid">
-            {filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {filtered.length > 0 ? (
+            <div className="wc-grid">
+              {filtered.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="wc-empty-state">
+              <p className="wc-empty-kicker">Coming soon</p>
+              <h3>{emptyMessage}</h3>
+              <p>We are still curating this section. Check back later for new PeakFit drops.</p>
+            </div>
+          )}
         </div>
       </section>
     </main>
