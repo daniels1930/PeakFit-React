@@ -1,4 +1,485 @@
-.women-collection-page {
-  min-height: 70vh;
-  background: #14001f;
+/* ── WomenCollection.css ─────────────────────────────────── */
+
+.wc-page {
+  background: #0a0a0a;
+  color: white;
+  font-family: "Poppins", Arial, sans-serif;
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.wc-hero {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  min-height: 520px;
+  background: linear-gradient(to bottom, #270149 0%, #0a0a0a 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* imagen bajada para no ver el corte */
+.wc-hero-img {
+  position: absolute;
+  right: 40px;
+  bottom: -60px;          /* baja la imagen */
+  height: 110%;           /* un poco más grande para cubrir */
+  width: auto;
+  object-fit: cover;
+  object-position: top center;
+  z-index: 1;
+}
+
+.wc-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(10, 0, 20, 0.80) 38%, transparent 72%);
+  z-index: 2;
+}
+
+.wc-hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 0 60px;
+  max-width: 560px;
+}
+
+.wc-hero-title {
+  font-family: "Bayon", Arial, sans-serif;
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 100;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: white;
+  margin: 0 0 20px;
+  letter-spacing: 2px;
+}
+
+.wc-hero-title span {
+  color: #d0ff00;
+}
+
+.wc-hero-sub {
+  font-family: "Jost", Arial, sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 36px;
+  line-height: 1.5;
+  max-width: 340px;
+}
+
+.wc-hero-btn {
+  background: #d0ff00;
+  border: none;
+  padding: 20px 40px;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0a0a0a;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: background 0.2s;
+}
+
+.wc-hero-btn:hover {
+  background: white;
+}
+
+.wc-hero-btn-arrow {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.wc-hero-next {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  background: rgba(208, 255, 0, 0.15);
+  border: none;
+  color: white;
+  font-size: 40px;
+  width: 52px;
+  height: 80px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px 0 0 6px;
+  transition: background 0.2s;
+}
+
+.wc-hero-next:hover {
+  background: rgba(208, 255, 0, 0.35);
+}
+
+.wc-hero-dots {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 4;
+}
+
+.wc-hero-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.wc-hero-dot.active {
+  background: #d0ff00;
+}
+
+/* ── Products section ─────────────────────────────────────── */
+.wc-products {
+  /* sin padding horizontal aquí para que la barra sea full width */
+  padding: 0;
+}
+
+/* barra verde — full ancho de pantalla */
+.wc-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #d0ff00;
+  padding: 14px 60px;      /* padding solo interno */
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wc-filter-title {
+  font-family: "Bayon", Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 100;
+  color: #0a0a0a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.wc-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.wc-tab {
+  background: transparent;
+  border: none;
+  padding: 8px 18px;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0a0a0a;
+  cursor: pointer;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.wc-tab:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.wc-tab.active {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* wrapper con padding para el grid */
+.wc-grid-wrap {
+  padding: 40px 60px 80px;
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+.wc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.wc-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.wc-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #1a1a1a;
+}
+
+.wc-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.wc-card-img-wrap:hover .wc-card-img {
+  transform: scale(1.04);
+}
+
+.wc-badge-new {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: white;
+  color: #0a0a0a;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+
+.wc-wishlist {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  cursor: pointer;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.wc-wishlist:hover {
+  transform: scale(1.15);
+}
+
+.wc-wishlist img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* hover overlay: flechas + shop now — solo al pasar el mouse */
+.wc-card-hover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 3;
+}
+
+.wc-card-hover.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* flechas en el centro vertical */
+.wc-card-hover-arrows {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  flex: 1;
+}
+
+/* shop now pegado al fondo */
+.wc-card-hover-bottom {
+  display: flex;
+}
+
+.wc-arrow {
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  color: white;
+  font-size: 28px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.wc-arrow:hover {
+  background: rgba(208, 255, 0, 0.9);
+  color: #0a0a0a;
+}
+
+/* shop now en el centro del hover */
+.wc-shop-now {
+  background: #d0ff00;
+  border: none;
+  width: 100%;
+  padding: 16px;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0a0a0a;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+.wc-shop-now:hover {
+  background: white;
+}
+
+/* card info */
+.wc-card-info {
+  padding: 10px 4px 4px;
+}
+
+.wc-card-name {
+  margin: 0 0 4px;
+  font-family: "Jost", Arial, sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.wc-card-price {
+  margin: 0;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Pagination ───────────────────────────────────────────── */
+.wc-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+
+.wc-page-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.wc-page-btn:hover {
+  background: rgba(208, 255, 0, 0.1);
+  border-color: #d0ff00;
+}
+
+.wc-page-btn.active {
+  background: #d0ff00;
+  border-color: #d0ff00;
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.wc-page-dots {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+.wc-view-all {
+  display: block;
+  margin: 0 auto;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: "Poppins", Arial, sans-serif;
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.15s;
+}
+
+.wc-view-all:hover {
+  color: #d0ff00;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .wc-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .wc-grid-wrap {
+    padding: 32px 40px 60px;
+  }
+  .wc-filter-bar {
+    padding: 14px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wc-hero-content {
+    padding: 0 28px;
+  }
+  .wc-hero-img {
+    right: 0;
+    opacity: 0.4;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    bottom: 0;
+  }
+  .wc-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .wc-grid-wrap {
+    padding: 24px 20px 48px;
+  }
+  .wc-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wc-hero-title {
+    font-size: 40px;
+  }
+  .wc-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
 }
