@@ -1,4 +1,194 @@
-.my-products-page {
-  min-height: 70vh;
-  background: linear-gradient(135deg, #120022, #111);
+
+/* Bayón */
+@import url('https://fonts.googleapis.com/css2?family=Bayon&family=Poppins:wght@400;600;700;900&display=swap');
+
+.mp-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Perfil de arriba */
+.mp-perfil {
+  background: linear-gradient(180deg, #1a0a2e 0%, #2a0a4e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 30px;
+  gap: 10px;
+  color: white;
+}
+
+.mp-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 500;
+  color: rgb(35, 12, 66);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Nombre Mateo */
+.mp-nombre-usuario {
+  font-size: 1.6rem;
+  margin: 0;
+  color: white;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-editar {
+  font-size: 0.85rem;
+  color: #ccc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Botones del perfil */
+.mp-botones {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mp-btn {
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid white;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-btn-inactivo {
+  background: transparent;
+  color: white;
+}
+
+.mp-btn-inactivo:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.mp-btn-activo {
+  background: #c8f500;
+  color: #111;
+  border-color: #c8f500;
+}
+
+/* Lista de compras */
+.mp-lista {
+  padding: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: #f5f5f5;
+}
+
+.mp-tarjeta {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+
+/* Fecha */
+.mp-fecha {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-tarjeta-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.mp-imagen {
+  width: 90px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  background-color: #ddd;
+  flex-shrink: 0;
+}
+
+.mp-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Delivered o entregado */
+.mp-estado {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-check {
+  color: #c8f500;
+  background: #111;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 0.75rem;
+}
+
+.mp-llegada {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-nombre-prod {
+  font-size: 0.85rem;
+  color: #444;
+  margin: 6px 0 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Botones View purchase y Repurchase */
+.mp-btn-accion {
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-width: 130px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mp-btn-ver {
+  background-color: #c8f500;
+  color: #111;
+}
+
+.mp-btn-recomprar {
+  background-color: #8ab800;
+  color: #111;
 }
