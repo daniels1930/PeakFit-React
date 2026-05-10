@@ -11,14 +11,14 @@ function Products() {
       <h2 className="titulo">Top sports sellers</h2>
 
       <ProductGrid products={firstRow} />
-      <button className="view-all" type="button">
+      <Link className="view-all" to="/collections/women">
         View all
-      </button>
+      </Link>
 
       <ProductGrid products={secondRow} />
-      <button className="view-all" type="button">
+      <Link className="view-all" to="/collections/men">
         View all
-      </button>
+      </Link>
 
       <div className="banner">BUY. SELL. TRAIN. GROW.</div>
 

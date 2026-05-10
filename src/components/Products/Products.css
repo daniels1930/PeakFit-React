@@ -96,11 +96,13 @@
 
 .view-all {
   display: block;
+  width: fit-content;
   margin: 60px auto;
   color: white;
   background: transparent;
   border: 0;
   text-decoration: underline;
+  text-underline-offset: 4px;
   cursor: pointer;
   font: inherit;
 }
