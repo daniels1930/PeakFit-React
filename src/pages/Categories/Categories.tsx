@@ -47,7 +47,9 @@ function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <img className="cat-card-img" src={product.images[imgIndex]} alt={product.name} />
+        <Link className="cat-card-link" to={`/products/${product.id}`} aria-label={`View ${product.name}`}>
+          <img className="cat-card-img" src={product.images[imgIndex]} alt={product.name} />
+        </Link>
 
         {product.isNew && <span className="cat-badge-new">NEW</span>}
 
@@ -80,9 +82,9 @@ function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
             </button>
           </div>
           <div className="cat-card-hover-bottom">
-            <button className="cat-shop-now" type="button">
+            <Link className="cat-shop-now" to={`/products/${product.id}`}>
               SHOP NOW
-            </button>
+            </Link>
           </div>
         </div>
       </div>

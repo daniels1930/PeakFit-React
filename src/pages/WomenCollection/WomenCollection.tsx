@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { womenProducts } from "../../data/womenProducts";
 import "./WomenCollection.css";
 
@@ -37,7 +38,9 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <img className="wc-card-img" src={product.images[imgIndex]} alt={product.name} />
+        <Link className="wc-card-link" to={`/products/${product.id}`} aria-label={`View ${product.name}`}>
+          <img className="wc-card-img" src={product.images[imgIndex]} alt={product.name} />
+        </Link>
 
         {product.isNew && <span className="wc-badge-new">NEW</span>}
 
@@ -65,7 +68,7 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
             <button className="wc-arrow" type="button" onClick={next} aria-label="Next image">›</button>
           </div>
           <div className="wc-card-hover-bottom">
-            <button className="wc-shop-now" type="button">SHOP NOW</button>
+            <Link className="wc-shop-now" to={`/products/${product.id}`}>SHOP NOW</Link>
           </div>
         </div>
       </div>

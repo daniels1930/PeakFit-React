@@ -1,17 +1,109 @@
-import { Link, useParams } from "react-router-dom";
-import { products } from "../../data/products";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
+import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
+
+function Stars({ rating }: { rating: number }) {
+  return (
+    <span className="pd-stars" aria-label={`${rating} out of 5 stars`}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <span key={index} className={index < rating ? "filled" : ""}>
+          &#9733;
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
+  const [liked, setLiked] = useState(false);
+
+  return (
+    <article className="pd-related-card">
+      <Link to={`/products/${product.id}`} className="pd-related-image">
+        <img src={product.images[0]} alt={product.name} />
+        {product.collection !== "Home" && <span>NEW</span>}
+        <button
+          className="pd-related-wishlist"
+          type="button"
+          aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setLiked((value) => !value);
+          }}
+        >
+          <img
+            className="pd-related-heart"
+            src={
+              liked
+                ? "/assets/images/pages/WomenCollection/heart-filled.png"
+                : "/assets/images/pages/WomenCollection/heart-empty.png"
+            }
+            alt=""
+          />
+        </button>
+      </Link>
+      <div className="pd-related-info">
+        <p>{product.name}</p>
+        <div>
+          <strong>{product.price}</strong>
+          <Link to={`/products/${product.id}`}>Shop Now</Link>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 function ProductDetail() {
   const { productId } = useParams();
-  const product = products.find((item) => item.id === productId);
+  const navigate = useNavigate();
+  const product = catalogProducts.find((item) => item.id === productId);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [questionSent, setQuestionSent] = useState(false);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewBody, setReviewBody] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviews, setReviews] = useState<ProductReview[]>(() =>
+    product ? getInitialReviews(product.id) : []
+  );
+
+  useEffect(() => {
+    if (!product) {
+      setReviews([]);
+      return;
+    }
+
+    setSelectedImage(0);
+    setLiked(false);
+    setQuestion("");
+    setQuestionSent(false);
+    setReviews(getInitialReviews(product.id));
+  }, [product]);
+
+  const relatedProducts = relatedCatalogProducts.filter((item) => item.id !== product?.id).slice(0, 8);
+  const viewedProducts = catalogProducts
+    .filter((item) => item.id !== product?.id && item.category === product?.category)
+    .slice(0, 8);
+
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) {
+      return 0;
+    }
+
+    return reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+  }, [reviews]);
 
   if (!product) {
     return (
       <main className="product-detail-page page-workspace">
-        <p className="page-kicker">Persona 1</p>
+        <p className="page-kicker">PeakFit product</p>
         <h1>Product not found</h1>
-        <p>Ese producto no existe en el catalogo.</p>
+        <p>This product is not available in the catalog.</p>
         <Link className="page-action" to="/">
           Back home
         </Link>
@@ -19,13 +111,211 @@ function ProductDetail() {
     );
   }
 
+  const submitQuestion = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!question.trim()) {
+      return;
+    }
+
+    setQuestion("");
+    setQuestionSent(true);
+  };
+
+  const submitReview = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!reviewName.trim() || !reviewTitle.trim() || !reviewBody.trim()) {
+      return;
+    }
+
+    const newReview: ProductReview = {
+      id: `${product.id}-user-review-${Date.now()}`,
+      author: reviewName.trim(),
+      date: "Just now",
+      rating: reviewRating,
+      title: reviewTitle.trim(),
+      body: reviewBody.trim(),
+    };
+
+    setReviews((currentReviews) => [newReview, ...currentReviews]);
+    setReviewName("");
+    setReviewTitle("");
+    setReviewBody("");
+    setReviewRating(5);
+  };
+
   return (
-    <main className="product-detail-page page-workspace">
-      <p className="page-kicker">Persona 1</p>
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
-      <p className="product-detail-price">{product.price}</p>
-      <img className="product-detail-image" src={product.imagePrimary} alt={product.name} />
+    <main className="product-detail-page">
+      <div className="pd-shell">
+        <button className="pd-back" type="button" onClick={() => navigate(-1)}>
+          <img className="pd-back-arrow" src="/assets/images/hero/flecha.png" alt="" />
+          <span>Back</span>
+        </button>
+
+        <section className="pd-hero-card">
+          <div className="pd-gallery">
+            <div
+              className="pd-main-image-frame"
+              style={{ ["--pd-image" as string]: `url(${product.images[selectedImage]})` }}
+            >
+              <img className="pd-main-image" src={product.images[selectedImage]} alt={product.name} />
+            </div>
+            <div className="pd-thumbs">
+              {product.images.map((image, index) => (
+                <button
+                  key={image}
+                  className={index === selectedImage ? "active" : ""}
+                  type="button"
+                  onClick={() => setSelectedImage(index)}
+                >
+                  <img src={image} alt="" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="pd-summary">
+            <button
+              className="pd-heart"
+              type="button"
+              aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={() => setLiked((value) => !value)}
+            >
+              <img
+                src={
+                  liked
+                    ? "/assets/images/pages/WomenCollection/heart-filled.png"
+                    : "/assets/images/pages/WomenCollection/heart-empty.png"
+                }
+                alt=""
+              />
+            </button>
+
+            <p className="pd-kicker">{product.collection}</p>
+            <h1>{product.name}</h1>
+            <p className="pd-price">{product.price}</p>
+            <div className="pd-rating">
+              <Stars rating={Math.round(averageRating)} />
+              <strong>{averageRating.toFixed(1)}</strong>
+              <span>({reviews.length} reviews)</span>
+            </div>
+
+            <p className="pd-description">{product.description}</p>
+
+            <div className="pd-highlights">
+              <h2>What you need to know about this product:</h2>
+              <ul>
+                {product.highlights.map((highlight) => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
+            </div>
+
+            <button className="pd-shop" type="button">
+              Shop Now <img src="/assets/images/hero/flecha.png" alt="" />
+            </button>
+            <button className="pd-cart" type="button">
+              Add to cart <img src="/assets/images/productos/shop_button.png" alt="" />
+            </button>
+          </div>
+        </section>
+
+        <section className="pd-section">
+          <h2>Related products</h2>
+          <div className="pd-carousel">
+            {relatedProducts.map((item) => (
+              <ProductTile key={item.id} product={item} />
+            ))}
+          </div>
+        </section>
+
+        <section className="pd-section pd-questions">
+          <h2>Asks and questions</h2>
+          <form onSubmit={submitQuestion}>
+            <textarea
+              value={question}
+              onChange={(event) => {
+                setQuestion(event.target.value);
+                setQuestionSent(false);
+              }}
+              placeholder="Write your question..."
+            />
+            <button type="submit">Ask</button>
+          </form>
+          {questionSent && (
+            <p className="pd-success-message">
+              Your question has been sent and will be answered soon.
+            </p>
+          )}
+        </section>
+
+        <section className="pd-section pd-reviews-section">
+          <div className="pd-reviews-heading">
+            <div>
+              <h2>Product reviews</h2>
+              <p>
+                {averageRating.toFixed(1)} <Stars rating={Math.round(averageRating)} />
+              </p>
+            </div>
+          </div>
+
+          <form className="pd-review-form" onSubmit={submitReview}>
+            <input
+              value={reviewName}
+              onChange={(event) => setReviewName(event.target.value)}
+              placeholder="Your name"
+            />
+            <input
+              value={reviewTitle}
+              onChange={(event) => setReviewTitle(event.target.value)}
+              placeholder="Review title"
+            />
+            <select
+              value={reviewRating}
+              onChange={(event) => setReviewRating(Number(event.target.value))}
+              aria-label="Review rating"
+            >
+              <option value={5}>5 stars</option>
+              <option value={4}>4 stars</option>
+              <option value={3}>3 stars</option>
+              <option value={2}>2 stars</option>
+              <option value={1}>1 star</option>
+            </select>
+            <textarea
+              value={reviewBody}
+              onChange={(event) => setReviewBody(event.target.value)}
+              placeholder="Write your review..."
+            />
+            <button type="submit">Add review</button>
+          </form>
+
+          <div className="pd-review-grid">
+            {reviews.map((review) => (
+              <article className="pd-review-card" key={review.id}>
+                <Stars rating={review.rating} />
+                <h3>{review.title}</h3>
+                <p>{review.body}</p>
+                <div>
+                  <span>{review.author}</span>
+                  <small>{review.date}</small>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {viewedProducts.length > 0 && (
+          <section className="pd-section">
+            <h2>Those who viewed this product also bought</h2>
+            <div className="pd-carousel">
+              {viewedProducts.map((item) => (
+                <ProductTile key={item.id} product={item} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }
