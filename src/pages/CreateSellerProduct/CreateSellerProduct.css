@@ -59,8 +59,8 @@
 }
 
 .csp-icono {
-  width: 100px;
-  height: 100px;
+  width: 160px;
+  height: 160px;
 }
 
 .csp-preview {
@@ -78,11 +78,11 @@
 
 /* NEW PRODUCT */
 .csp-titulo {
-  font-size: 2.8rem;
+  font-size: 4rem;   
   font-family: 'Bayon', sans-serif;
-  color: #c8f500;
+  color: white; 
   text-transform: uppercase;
-  margin: 0 0 10px;
+  margin: 0 0 1px;
   letter-spacing: 2px;
   font-weight: 400;
 }
@@ -97,7 +97,7 @@
 
 /* Inputs */
 .csp-input {
-  background-color: #1e0a35;
+  background-color: rgba(255, 255, 255, 0.15);
   border: 1.5px solid #6a3a9a;
   border-radius: 6px;
   padding: 12px 16px;
@@ -108,6 +108,7 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
+
 
 .csp-input::placeholder {
   color: #888;
@@ -123,7 +124,7 @@
 
 /* Textarea */
 .csp-textarea {
-  background-color: #1e0a35;
+  background-color: rgba(255, 255, 255, 0.15);
   border: 1.5px solid #6a3a9a;
   border-radius: 6px;
   padding: 12px 16px;
@@ -136,7 +137,6 @@
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
 }
-
 .csp-textarea::placeholder {
   color: #888;
 }
@@ -145,7 +145,7 @@
   border-color: #c8f500;
 }
 
-/* Botones New / Used */
+/* Botones New y Used */
 .csp-estado-botones {
   display: flex;
   gap: 12px;
