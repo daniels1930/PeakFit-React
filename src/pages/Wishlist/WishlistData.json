@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "name": "Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-1.png",
+    "favorite": true
+  }, 
+  {
+    "id": 2,
+    "name": "Micronized Creatine Powder Professional Performance Formula",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-2.png",
+    "favorite": true
+  },
+  {
+    "id": 3,
+    "name": "Professional Ab Roller Wheel with Non-Slip Handles",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-3.png",
+    "favorite": true
+  },
+  {
+    "id": 4,
+    "name": "Women Running Shoes Lightweight Breathable Sneakers",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-4.png",
+    "favorite": true
+  },
+  {
+    "id": 5,
+    "name": "Adjustable Jump Rope for Cardio and Fitness Training",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-5.png",
+    "favorite": true
+  },
+  {
+    "id": 6,
+    "name": "Hex Rubber Dumbbell Professional Gym Equipment",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-6.png",
+    "favorite": true
+  },
+  {
+    "id": 7,
+    "name": "Adjustable Speed Jump Rope for Training",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-5.png",
+    "favorite": true
+  },
+  {
+    "id": 8,
+    "name": "On Running Cloud Shoes Performance Sneakers",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-8.png",
+    "favorite": true
+  },
+  {
+    "id": 9,
+    "name": "MuscleTech Mass Tech Extreme 2000 Protein Powder",
+    "price": 42,
+    "image": "/assets/images/pages/Wishlist/WL-9.png",
+    "favorite": true
+  }
+]
