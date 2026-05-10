@@ -1,4 +1,189 @@
-.create-seller-product-page {
-  min-height: 70vh;
-  background: linear-gradient(135deg, #080808, #270149);
+/* CreateSellerProduct */
+/* Fondo y formulario con inputs */
+
+.csp-page {
+  background: linear-gradient(180deg, #1a0a2e 0%, #2a0a4e 100%);
+  min-height: 100vh;
+  padding: 24px 60px 60px;
+  font-family: Arial, sans-serif;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* Botón "Back" */
+.csp-back {
+  background-color: #c8f500;
+  color: #111;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 30px;
+  display: inline-block;
+}
+
+.csp-back:hover {
+  opacity: 0.85;
+}
+
+/* Imagen y formulario */
+.csp-contenido {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+}
+
+/*Caja de la imagen de la izquierda */
+.csp-imagen-zona {
+  width: 480px;
+  height: 500px;
+  background-color: #0d0d1a;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Label que actúa como botón para abrir los archivos */
+.csp-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  color: #777;
+  font-size: 1rem;
+}
+
+/* Ícono de subir imagen */
+.csp-icono {
+  width: 100px;
+  height: 100px;
+}
+
+/* Preview cuando ya eligió una imagen */
+.csp-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Formulario derecho */
+.csp-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* NEW PRODUCT */
+.csp-titulo {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #c8f500;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  letter-spacing: 2px;
+}
+
+.csp-label {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #c8f500;
+  margin-top: 6px;
+}
+
+/* Inputs de texto */
+.csp-input {
+  background-color: #1e0a35;
+  border: 1.5px solid #6a3a9a;
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.csp-input::placeholder {
+  color: #888;
+}
+
+.csp-input:focus {
+  border-color: #c8f500;
+}
+
+/* Input de precio */
+.csp-input-precio {
+  width: 150px;
+}
+
+/* Descripción */
+.csp-textarea {
+  background-color: #1e0a35;
+  border: 1.5px solid #6a3a9a;
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 0.95rem;
+  outline: none;
+  width: 100%;
+  height: 100px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.csp-textarea::placeholder {
+  color: #888;
+}
+
+.csp-textarea:focus {
+  border-color: #c8f500;
+}
+
+/* Botones New y Used */
+.csp-estado-botones {
+  display: flex;
+  gap: 12px;
+}
+
+.csp-estado-btn {
+  padding: 10px 40px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  background-color: #3a1a5e; /* inactivo: morado oscuro */
+  color: white;
+}
+
+/* Botón activo */
+.csp-activo {
+  background-color: #c8f500;
+  color: #111;
+}
+
+/*  Botón Save changes*/
+.csp-btn-guardar {
+  background-color: #c8f500;
+  color: #111;
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+
+.csp-btn-guardar:hover {
+  opacity: 0.85;
 }
