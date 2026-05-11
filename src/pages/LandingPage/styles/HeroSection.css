@@ -6,9 +6,7 @@
   overflow-x: hidden;
 }
 
-/* ========================================
-   HERO VIDEO
-======================================== */
+/* HERO VIDEO */
 
 .hero-video-container {
   position: relative;
@@ -28,9 +26,7 @@
   display: block;
 }
 
-/* ========================================
-   OVERLAY
-======================================== */
+/* OVERLAY */
 
 .hero-overlay {
   position: absolute;
@@ -46,9 +42,7 @@
   justify-content: flex-start;
 }
 
-/* ========================================
-   TITLE
-======================================== */
+/* TITLE */
 
 .hero-overlay h1 {
   font-size: clamp(4rem, 8vw, 9rem);
@@ -66,9 +60,7 @@
   color: #d0ff00;
 }
 
-/* ========================================
-   BUTTON
-======================================== */
+/* BUTTON */
 
 .hero-overlay button {
   min-height: 70px !important;
@@ -78,9 +70,7 @@
   font-weight: 700;
 }
 
-/* ========================================
-   GLASS EFFECT
-======================================== */
+/* GLASS EFFECT */
 
 .hero-glass {
   position: absolute;
@@ -123,9 +113,7 @@
   line-height: 1.6;
 }
 
-/* ========================================
-   COMMUNITY TEXT
-======================================== */
+/* COMMUNITY TEXT */
 
 .hero-community-text {
   padding: 70px 20px 70px;
@@ -139,9 +127,7 @@
   line-height: 1.4;
 }
 
-/* ========================================
-   CARDS
-======================================== */
+/* CARDS */
 
 .hero-cards {
   display: grid;
@@ -175,9 +161,7 @@
   cursor: pointer;
 }
 
-/* ========================================
-   CTA BUTTON
-======================================== */
+/* CTA BUTTON */
 
 .hero-bottom-button {
   display: flex;
@@ -185,9 +169,7 @@
   padding-top: 75px;
 }
 
-/* ========================================
-   TABLET
-======================================== */
+/* TABLET */
 
 @media (max-width: 992px) {
   .hero-video-container {
@@ -205,9 +187,7 @@
   }
 }
 
-/* ========================================
-   MOBILE
-======================================== */
+/* MOBILE */
 
 @media (max-width: 768px) {
   .hero-video-container {
@@ -295,9 +275,7 @@
   }
 }
 
-/* ========================================
-   SMALL MOBILE
-======================================== */
+/* SMALL MOBILE */
 
 @media (max-width: 480px) {
   .hero-video-container {
