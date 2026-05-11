@@ -6,12 +6,12 @@
 .offer-title {
   background: #d0ff00;
 
-  padding: 40px 5%;
+  padding: 5px 5%;
 }
 
 .offer-title h2 {
   color: black;
-
+  margin: 0;
   font-size: 5rem;
   font-weight: 900;
 }
@@ -20,17 +20,21 @@
   width: 100%;
   display: block;
 
-  padding: 80px 5%;
+  padding: 40px 5% 14px;
 }
 
 .offer-description {
-  padding: 0 5% 80px;
+  padding: 5% 5% 0px;
 
   font-size: 2rem;
 
   line-height: 1.4;
 
   max-width: 1200px;
+}
+.offer-description p {
+  padding: 0px;
+  margin: 0;
 }
 
 /* RESPONSIVE */

@@ -2,72 +2,151 @@
   background: black;
   color: white;
 
-  padding: 80px 5%;
+  padding: 20px 5% 60px;
 }
 
+/* TITLE */
+
 .about-section h2 {
-  font-size: 5rem;
+  font-size: clamp(3rem, 7vw, 5rem);
+
   font-weight: 900;
 
   margin-bottom: 30px;
+
+  line-height: 0.9;
 }
 
+/* DESCRIPTION */
+
 .about-description {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.5rem);
 
   max-width: 1200px;
 
   line-height: 1.4;
 
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
+
+/* CONTENT */
 
 .about-content {
   display: flex;
 
-  align-items: center;
+  align-items: stretch;
 
-  gap: 50px;
+  gap: 40px;
 }
+
+/* VIDEO */
 
 .about-video {
   width: 50%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+/* RIGHT TEXT */
+
+.about-text-side {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
 }
 
 .about-text-side h3 {
-  font-size: 5rem;
+  font-size: clamp(3rem, 6vw, 7rem);
+
   font-weight: 400;
 
-  line-height: 1;
+  line-height: 1.5;
+
+  max-width: 650px;
 }
+
+/* BUTTON */
 
 .about-button {
   display: flex;
   justify-content: center;
+  
 
-  margin-top: 50px;
+  margin-top: 60px;
 }
 
-/* RESPONSIVE */
+/* =========================================
+   TABLET
+========================================= */
 
 @media (max-width: 992px) {
   .about-content {
-    flex-direction: column;
-  }
-
-  .about-video {
-    width: 100%;
+    gap: 25px;
   }
 
   .about-section h2 {
-    font-size: 3rem;
+    font-size: 4rem;
   }
 
   .about-text-side h3 {
-    font-size: 3rem;
+    font-size: 4rem;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 10px 20px 60px;
+  }
+
+  .about-content {
+    flex-direction: row;
+
+    align-items: stretch;
+
+    gap: 15px;
+  }
+
+  .about-video {
+    width: 48%;
+  }
+
+  .about-text-side {
+    width: 52%;
+  }
+
+  .about-text-side h3 {
+    font-size: clamp(2.3rem, 8vw, 4rem);
+
+    line-height: 1;
   }
 
   .about-description {
-    font-size: 1.2rem;
+    margin-bottom: 40px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+  .about-section h2 {
+    font-size: 3.5rem;
+  }
+
+  .about-description {
+    font-size: 1rem;
+  }
+
+  .about-text-side h3 {
+    font-size: 2.5rem;
   }
 }

@@ -128,7 +128,7 @@
 ======================================== */
 
 .hero-community-text {
-  padding: 100px 20px 70px;
+  padding: 70px 20px 70px;
 
   text-align: center;
 }
@@ -151,12 +151,28 @@
   gap: 20px;
 
   padding: 0 5%;
+
+  border-radius: 8px;
 }
 
 .hero-cards img {
   width: 100%;
 
+  height: auto;
+
+  border-radius: 8px;
+
   display: block;
+
+  transition: transform 0.3s ease;
+}
+
+.hero-cards img:hover {
+  transform: translateY(-6px);
+
+  filter: brightness(1.03);
+
+  cursor: pointer;
 }
 
 /* ========================================
@@ -166,8 +182,7 @@
 .hero-bottom-button {
   display: flex;
   justify-content: center;
-
-  padding: 80px 20px;
+  padding-top: 75px;
 }
 
 /* ========================================
@@ -246,7 +261,7 @@
 
     gap: 16px;
 
-    padding: 0 20px 20px;
+    padding: 0 20px 5px;
 
     scroll-snap-type: x mandatory;
 
@@ -260,7 +275,7 @@
 
     scroll-snap-align: center;
 
-    border-radius: 12px;
+    border-radius: 8px;
   }
 
   .hero-cards::-webkit-scrollbar {
@@ -272,7 +287,7 @@
   }
 
   .hero-community-text {
-    padding: 70px 20px 50px;
+    padding: 50px 20px 50px;
   }
 
   .hero-community-text p {
