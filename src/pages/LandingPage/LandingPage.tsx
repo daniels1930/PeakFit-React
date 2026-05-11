@@ -1,13 +1,19 @@
 import "./LandingPage.css";
 
-function LandingPage() {
+import HeroSection from "./components/HeroSection";
+import AboutSection from "./components/AboutSection";
+import OfferSection from "./components/OfferSection";
+import MotivationSection from "./components/MotivationSection";
+
+const LandingPage = () => {
   return (
-    <main className="landing-page page-workspace">
-      <p className="page-kicker">Persona 2</p>
-      <h1>Landing Page</h1>
-      <p>Entrada comercial de PeakFit. Aqui va la pantalla de bienvenida del prototipo.</p>
+    <main className="landing-page">
+      <HeroSection />
+      <AboutSection />
+      <OfferSection />
+      <MotivationSection />
     </main>
   );
-}
+};
 
 export default LandingPage;
