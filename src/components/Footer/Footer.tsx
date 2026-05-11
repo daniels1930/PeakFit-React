@@ -4,20 +4,6 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <div className="footer-top">
-          <div className="logo-box">
-            <img src="/assets/images/footer/logo.png" alt="PeakFit" />
-          </div>
-
-          <p>
-            PeakFit is a fitness focused e-commerce and marketplace built for a driven and growing fit
-            community. It&apos;s more than just an online store it&apos;s a platform where users can buy
-            high quality gym accessories, apparel, supplements, and lifestyle products, while also selling
-            their own fitness brands and creations. PeakFit connects passionate athletes, creators, and
-            entrepreneurs in one powerful ecosystem designed to support performance, growth, and community.
-          </p>
-        </div>
-
         <div className="footer-bottom">
           <div>
             <h4>Follow Us</h4>

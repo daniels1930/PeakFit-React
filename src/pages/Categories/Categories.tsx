@@ -1,5 +1,6 @@
 import { type MouseEvent, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import { useWishlist } from "../../context/WishlistContext";
 import { categoryProducts } from "../../data/categoryProducts";
 import "./Categories.css";
 
@@ -26,9 +27,17 @@ const categoryInfo = {
 }>;
 
 function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [imgIndex, setImgIndex] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  const wishlistItem = {
+    id: product.id,
+    name: product.name,
+    image: product.images[0],
+    price: product.price,
+  };
+  const liked = isInWishlist(product.id);
 
   const prev = (event: MouseEvent) => {
     event.stopPropagation();
@@ -59,7 +68,7 @@ function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
           aria-label="Add to wishlist"
           onClick={(event) => {
             event.stopPropagation();
-            setLiked((value) => !value);
+            toggleWishlist(wishlistItem);
           }}
         >
           <img

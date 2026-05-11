@@ -172,11 +172,27 @@
 
   text-align: center;
 
-  color: #d9ff00;
+  color: #d4d4d4;
 
   font-size: 0.95rem;
+}
 
+.login-link a {
+  color: #d9ff00;
+  font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.signup-form-error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: -4px 0 4px;
 }
 
 @media (max-width: 1200px) {

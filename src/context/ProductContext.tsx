@@ -21,7 +21,7 @@ const ProductContext = createContext<ProductContextType | null>(null);
 
 export function useProductos() {
   const ctx = useContext(ProductContext);
-  if (!ctx) throw new Error('Falta ProductProvider en main.tsx');
+  if (!ctx) throw new Error('ProductProvider is missing in main.tsx');
   return ctx;
 }
 

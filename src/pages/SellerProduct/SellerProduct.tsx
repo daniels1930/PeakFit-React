@@ -23,7 +23,7 @@ function SellerProduct() {
         <div className="sp-crear-derecha">
           <img
             src="/assets/images/pages/CreateSellerProduct/Flecha.png"
-            alt="subir imagen"
+            alt="Upload image"
             className="sp-icono"
           />
 

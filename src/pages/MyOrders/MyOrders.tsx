@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import PageBackButton from '../../components/PageBackButton/PageBackButton';
 import './MyOrders.css';
+import '../Wishlist/Wishlist.css';
 
 const pedidos = [
   {
@@ -37,58 +38,26 @@ const pedidos = [
 ];
 
 function MyOrders() {
-  const navigate = useNavigate();
-
   return (
-    <div className="mo-page">
+    <main className="wishlist-page">
+      <PageBackButton />
 
-      {/* Perfil */}
-      <div className="mo-perfil">
-
-        <div className="mo-avatar">M</div>
-
-        <h2 className="mo-nombre-usuario">Mateo</h2>
-
-        <span className="mo-editar">
-          Edit profile ↗
-        </span>
-
-        <div className="mo-botones">
-
-          {/* Wishlist */}
-          <button className="mo-btn mo-btn-inactivo">
-            Wishlist ♡
-          </button>
-
-          {/* Botón activo */}
-          <button className="mo-btn mo-btn-activo">
-            My Orders
-          </button>
-
-          {/* Navega a My Products */}
-          <button
-            className="mo-btn mo-btn-inactivo"
-            onClick={() => navigate('/my-products')}
-          >
-            My purchases
-          </button>
-
+      <section className="wishlist-header">
+        <div className="wishlist-title" role="presentation">
+          My Orders
+          <img
+            src="/assets/images/pages/Profile/Truck.png"
+            alt=""
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Lista */}
-      <div className="mo-lista">
-
+      <section className="wishlist-grid">
         {pedidos.map((p) => (
-
-          <div key={p.id} className="mo-tarjeta">
-
-            <p className="mo-fecha">
-              {p.fecha}
-            </p>
+          <article key={p.id} className="mo-tarjeta">
+            <p className="mo-fecha">{p.fecha}</p>
 
             <div className="mo-tarjeta-fila">
-
               <img
                 src={p.imagen}
                 alt={p.nombre}
@@ -96,43 +65,27 @@ function MyOrders() {
               />
 
               <div className="mo-info">
-
                 <p className="mo-estado">
                   {p.estado}{' '}
                   <span className="mo-check">✓</span>
                 </p>
-
-                <p className="mo-llegada">
-                  {p.llegada}
-                </p>
-
-                <p className="mo-nombre-prod">
-                  {p.nombre}
-                </p>
-
+                <p className="mo-llegada">{p.llegada}</p>
+                <p className="mo-nombre-prod">{p.nombre}</p>
               </div>
 
               <div className="mo-acciones">
-
-                <button className="mo-btn-accion mo-btn-ver">
+                <button type="button" className="mo-btn-accion mo-btn-ver">
                   View purchase
                 </button>
-
-                <button className="mo-btn-accion mo-btn-recomprar">
+                <button type="button" className="mo-btn-accion mo-btn-recomprar">
                   Repurchase
                 </button>
-
               </div>
-
             </div>
-
-          </div>
-
+          </article>
         ))}
-
-      </div>
-
-    </div>
+      </section>
+    </main>
   );
 }
 

@@ -1,5 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import PageBackButton from "../../components/PageBackButton/PageBackButton";
+import { catalogProductToWishlist, useWishlist } from "../../context/WishlistContext";
 import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
 import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
@@ -17,7 +19,8 @@ function Stars({ rating }: { rating: number }) {
 }
 
 function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
-  const [liked, setLiked] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const liked = isInWishlist(product.id);
 
   return (
     <article className="pd-related-card">
@@ -31,7 +34,7 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            setLiked((value) => !value);
+            toggleWishlist(catalogProductToWishlist(product));
           }}
         >
           <img
@@ -58,10 +61,9 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
 
 function ProductDetail() {
   const { productId } = useParams();
-  const navigate = useNavigate();
   const product = catalogProducts.find((item) => item.id === productId);
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [question, setQuestion] = useState("");
   const [questionSent, setQuestionSent] = useState(false);
   const [reviewName, setReviewName] = useState("");
@@ -79,7 +81,6 @@ function ProductDetail() {
     }
 
     setSelectedImage(0);
-    setLiked(false);
     setQuestion("");
     setQuestionSent(false);
     setReviews(getInitialReviews(product.id));
@@ -110,6 +111,8 @@ function ProductDetail() {
       </main>
     );
   }
+
+  const liked = isInWishlist(product.id);
 
   const submitQuestion = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -148,10 +151,7 @@ function ProductDetail() {
   return (
     <main className="product-detail-page">
       <div className="pd-shell">
-        <button className="pd-back" type="button" onClick={() => navigate(-1)}>
-          <img className="pd-back-arrow" src="/assets/images/hero/flecha.png" alt="" />
-          <span>Back</span>
-        </button>
+        <PageBackButton className="pd-back-wrap" />
 
         <section className="pd-hero-card">
           <div className="pd-gallery">
@@ -180,7 +180,7 @@ function ProductDetail() {
               className="pd-heart"
               type="button"
               aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
-              onClick={() => setLiked((value) => !value)}
+              onClick={() => toggleWishlist(catalogProductToWishlist(product))}
             >
               <img
                 src={

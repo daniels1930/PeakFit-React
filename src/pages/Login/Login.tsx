@@ -1,6 +1,26 @@
+import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
 
 function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    const ok = login(email, password);
+    if (ok) {
+      navigate("/", { replace: true });
+    } else {
+      setError("Incorrect email or password.");
+    }
+  }
+
   return (
     <main className="login-page">
       <img
@@ -25,22 +45,34 @@ function Login() {
             sign in to your account
           </p>
 
-          <form className="login-form">
-            <label>Email</label>
+          <form className="login-form" onSubmit={handleSubmit}>
+            <label htmlFor="login-email">Email</label>
 
             <input
+              id="login-email"
               type="email"
               placeholder="Input your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
             />
 
-            <label>Password</label>
+            <label htmlFor="login-password">Password</label>
 
             <input
+              id="login-password"
               type="password"
               placeholder="Password12334."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
             />
 
-            <a href="#" className="forgot-password">
+            {error ? <p className="login-form-error" role="alert">{error}</p> : null}
+
+            <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>
               Forgot password?
             </a>
 
@@ -54,38 +86,38 @@ function Login() {
           </div>
 
           <div className="social-login">
-  <button>
-    <img
-      src="/assets/images/pages/Login/Google.png"
-      alt="Google"
-    />
-  </button>
+            <button type="button">
+              <img
+                src="/assets/images/pages/Login/Google.png"
+                alt="Google"
+              />
+            </button>
 
-  <button>
-    <img
-      src="/assets/images/pages/Login/Facebook.png"
-      alt="Facebook"
-    />
-  </button>
+            <button type="button">
+              <img
+                src="/assets/images/pages/Login/Facebook.png"
+                alt="Facebook"
+              />
+            </button>
 
-  <button>
-    <img
-      src="/assets/images/pages/Login/Apple.png"
-      alt="Apple"
-    />
-  </button>
+            <button type="button">
+              <img
+                src="/assets/images/pages/Login/Apple.png"
+                alt="Apple"
+              />
+            </button>
 
-  <button>
-    <img
-      src="/assets/images/pages/Login/Microsoft.png"
-      alt="Microsoft"
-    />
-  </button>
-</div>
+            <button type="button">
+              <img
+                src="/assets/images/pages/Login/Microsoft.png"
+                alt="Microsoft"
+              />
+            </button>
+          </div>
 
           <p className="signup-link">
-            Don’t have an account?
-            <span> Sign up</span>
+            Don&apos;t have an account?{" "}
+            <Link to="/signup">Sign up</Link>
           </p>
         </div>
       </section>

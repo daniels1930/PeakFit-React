@@ -19,29 +19,8 @@
   color: #111;
 }
 
-.edit-profile-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  background: #d9ff00;
-  color: #111;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
+.edit-profile-page .page-back-btn {
   margin-bottom: 24px;
-}
-
-.edit-profile-back img {
-  width: 18px;
-  height: 18px;
-
-  object-fit: contain;
-
-  display: block;
 }
 
 .edit-profile-layout {
@@ -276,7 +255,7 @@
     padding: 14px 12px 18px;
   }
 
-  .edit-profile-back {
+  .edit-profile-page .page-back-btn {
     margin-bottom: 14px;
   }
 

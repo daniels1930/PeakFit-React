@@ -1,6 +1,27 @@
+import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./SignUp.css";
 
 function SignUp() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+    const ok = register(name, email, password);
+    if (ok) {
+      navigate("/login", { replace: true });
+    } else {
+      setError("Could not create account. That email may already be in use.");
+    }
+  }
+
   return (
     <main className="signup-page">
       <img
@@ -26,27 +47,44 @@ function SignUp() {
             personalized recommendations, and member only offers.
           </p>
 
-          <form className="signup-form">
-            <label>Name</label>
+          <form className="signup-form" onSubmit={handleSubmit}>
+            <label htmlFor="signup-name">Name</label>
 
             <input
+              id="signup-name"
               type="text"
               placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              required
             />
 
-            <label>Email</label>
+            <label htmlFor="signup-email">Email</label>
 
             <input
+              id="signup-email"
               type="email"
               placeholder="Input your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
             />
 
-            <label>Password</label>
+            <label htmlFor="signup-password">Password</label>
 
             <input
+              id="signup-password"
               type="password"
               placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              required
             />
+
+            {error ? <p className="signup-form-error" role="alert">{error}</p> : null}
 
             <button type="submit">
               CREATE ACCOUNT
@@ -54,7 +92,8 @@ function SignUp() {
           </form>
 
           <p className="login-link">
-            You already have an account?
+            You already have an account?{" "}
+            <Link to="/login">Log in</Link>
           </p>
         </div>
       </section>

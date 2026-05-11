@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductos } from '../../context/ProductContext';
+import PageBackButton from '../../components/PageBackButton/PageBackButton';
 import './CreateSellerProduct.css';
 
 function CreateSellerProduct() {
@@ -43,11 +44,11 @@ function CreateSellerProduct() {
 
   function guardar() {
     if (!titulo.trim()) {
-      alert('Escribe un título para el producto');
+      alert('Enter a title for the product');
       return;
     }
     if (!precio.trim()) {
-      alert('Escribe un precio');
+      alert('Enter a price');
       return;
     }
 
@@ -75,23 +76,21 @@ function CreateSellerProduct() {
   return (
     <div className="csp-page">
 
-      <button className="csp-back" onClick={() => navigate('/seller-product')}>
-        ← Back
-      </button>
+      <PageBackButton onClick={() => navigate('/seller-product')} />
 
       <div className="csp-contenido">
 
         {/* Zona de imagen */}
         <div className="csp-imagen-zona">
           {imagen ? (
-            <img src={imagen} alt="producto" className="csp-preview" />
+            <img src={imagen} alt="Product preview" className="csp-preview" />
           ) : (
             <label className="csp-upload-label" htmlFor="inputImagen">
 
               {/* imagen flecha */}
               <img
                 src="/assets/images/pages/CreateSellerProduct/Flecha.png"
-                alt="subir imagen"
+                alt="Upload image"
                  className="csp-icono"
               />
 

@@ -11,26 +11,8 @@
   padding: 28px 0 88px;
 }
 
-.pd-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+.pd-back-wrap {
   margin-bottom: 24px;
-  padding: 8px 14px;
-  border: 0;
-  border-radius: 4px;
-  background: #d0ff00;
-  color: #0a0a0a;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.pd-back-arrow {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  transform: rotate(180deg);
 }
 
 .pd-hero-card {

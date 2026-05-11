@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import "./Navbar.css";
 
 const quickLinks = [
@@ -16,6 +17,7 @@ const navLinks = [
 ];
 
 function Navbar() {
+  const { user } = useAuth();
   return (
     <header className="header">
       <div className="top-header">
@@ -51,7 +53,7 @@ function Navbar() {
         <div className="user-section">
           <Link className="user-info" to="/profile">
             <img src="/assets/images/Header/Usuario.png" alt="" />
-            Mateo
+            {user?.name}
           </Link>
           <Link className="my-products" to="/my-products">
             My products

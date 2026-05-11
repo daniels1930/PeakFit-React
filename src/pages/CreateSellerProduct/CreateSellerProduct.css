@@ -10,23 +10,8 @@
   box-sizing: border-box;
 }
 
-/* Botón Back */
-.csp-back {
-  background-color: #c8f500;
-  color: #111;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
+.csp-page > .page-back-btn {
   margin-bottom: 30px;
-  display: inline-block;
-  font-family: 'Poppins', sans-serif;
-}
-
-.csp-back:hover {
-  opacity: 0.85;
 }
 
 .csp-contenido {

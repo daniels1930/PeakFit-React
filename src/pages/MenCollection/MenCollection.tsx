@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useWishlist } from "../../context/WishlistContext";
 import { menProducts } from "../../data/menProducts";
 import "./MenCollection.css";
 
@@ -18,9 +19,17 @@ const emptyMessages: Record<Exclude<FilterTab, "all">, string> = {
 };
 
 function ProductCard({ product }: { product: typeof menProducts[0] }) {
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [imgIndex, setImgIndex] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  const wishlistItem = {
+    id: product.id,
+    name: product.name,
+    image: product.images[0],
+    price: product.price,
+  };
+  const liked = isInWishlist(product.id);
 
   const prev = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -51,7 +60,7 @@ function ProductCard({ product }: { product: typeof menProducts[0] }) {
           aria-label="Add to wishlist"
           onClick={(event) => {
             event.stopPropagation();
-            setLiked((value) => !value);
+            toggleWishlist(wishlistItem);
           }}
         >
           <img
