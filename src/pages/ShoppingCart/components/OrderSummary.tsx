@@ -1,37 +1,43 @@
-import "../styles/orderSummary.css";
+import { useNavigate } from "react-router-dom";
+import "../styles/OrderSummary.css";
+import { useCart } from "../../../context/CartContext";
+import { formatUsd } from "../../../utils/price";
 
 const OrderSummary = () => {
+  const { lines, subtotal } = useCart();
+  const navigate = useNavigate();
+  const hasItems = lines.length > 0;
+
   return (
     <div className="summary">
-
-      {/* LOGO */}
       <div className="logo">
         <img
           src="/assets/images/pages/ShoppingCart/logoAl.png"
-          alt="logo"
+          alt="PeakFit"
           className="logo-img"
         />
       </div>
 
-      {/* TITLE */}
       <h3>Order Summary</h3>
 
-      {/* ITEMS */}
       <div className="summary-item">
-        <span>Product</span>
-        <span>$62 USD</span>
+        <span>Products ({lines.reduce((n, l) => n + l.quantity, 0)})</span>
+        <span>{hasItems ? formatUsd(subtotal) : "$0.00 USD"}</span>
       </div>
 
       <div className="summary-item total">
         <span>Total</span>
-        <span>$62 USD</span>
+        <span>{hasItems ? formatUsd(subtotal) : "$0.00 USD"}</span>
       </div>
 
-      {/* BUTTON */}
-      <button className="checkout-btn">
+      <button
+        type="button"
+        className="checkout-btn"
+        disabled={!hasItems}
+        onClick={() => navigate("/pay")}
+      >
         Continue to checkout
       </button>
-
     </div>
   );
 };

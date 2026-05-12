@@ -6,9 +6,17 @@
 }
 
 .cart-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-size: 42px;
   font-weight: bold;
   margin-bottom: 30px;
+}
+
+.cart-title-icon {
+  flex-shrink: 0;
+  display: block;
 }
 
 /* 🔥 GRID REAL COMO FIGMA */

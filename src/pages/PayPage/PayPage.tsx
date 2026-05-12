@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+import { formatUsd } from "../../utils/price";
 import "./PayPage.css";
 
 type ShippingForm = {
@@ -34,6 +36,7 @@ function isEmail(value: string) {
 
 function PayPage() {
   const navigate = useNavigate();
+  const { lines, subtotal, clearCart } = useCart();
   const [step, setStep] = useState<1 | 2>(1);
   const [shipping, setShipping] = useState<ShippingForm>(initialShipping);
   const [shippingErrors, setShippingErrors] = useState<Errors<ShippingForm>>(
@@ -43,26 +46,23 @@ function PayPage() {
   const [confirmed, setConfirmed] = useState(false);
   const [confirmError, setConfirmError] = useState<string>("");
 
-  // UI only: mock summary (can be replaced by cart state later)
+  useEffect(() => {
+    if (lines.length === 0) {
+      navigate("/cart", { replace: true });
+    }
+  }, [lines.length, navigate]);
+
   const summary = useMemo(
     () => ({
-      items: [
-        {
-          id: "1",
-          name: "Set - Sports Top + High Impact Leggings",
-          qty: 1,
-          price: 62,
-        },
-        {
-          id: "2",
-          name: "Sports jacket – Long sleeve with zipper",
-          qty: 1,
-          price: 62,
-        },
-      ],
-      total: 124,
+      items: lines.map((line) => ({
+        id: line.id,
+        name: line.name,
+        qty: line.quantity,
+        lineTotal: line.unitPrice * line.quantity,
+      })),
+      total: subtotal,
     }),
-    [],
+    [lines, subtotal],
   );
 
   function handleShippingChange<K extends keyof ShippingForm>(
@@ -89,19 +89,19 @@ function PayPage() {
 
     for (const field of required) {
       const v = shipping[field].trim();
-      if (!v) next[field] = "Este campo es obligatorio";
+      if (!v) next[field] = "This field is required";
     }
 
     if (shipping.email.trim() && !isEmail(shipping.email.trim())) {
-      next.email = "Ingresa un email válido";
+      next.email = "Enter a valid email address";
     }
 
     if (shipping.phone.trim() && shipping.phone.trim().length < 7) {
-      next.phone = "Ingresa un teléfono válido";
+      next.phone = "Enter a valid phone number";
     }
 
     if (shipping.postalCode.trim() && shipping.postalCode.trim().length < 4) {
-      next.postalCode = "Ingresa un código postal válido";
+      next.postalCode = "Enter a valid postal code";
     }
 
     setShippingErrors(next);
@@ -122,16 +122,22 @@ function PayPage() {
   function handleConfirmPurchase() {
     setConfirmError("");
     if (!confirmed) {
-      setConfirmError("Debes confirmar para continuar");
+      setConfirmError("Please confirm to continue");
       return;
     }
 
+    const paidTotal = summary.total;
+    clearCart();
     navigate("/payment-success", {
       state: {
         shipping,
-        total: summary.total,
+        total: paidTotal,
       },
     });
+  }
+
+  if (lines.length === 0) {
+    return null;
   }
 
   return (
@@ -139,31 +145,31 @@ function PayPage() {
       <div className="pay-page__container">
         <div className="pay-page__header">
           <p className="page-kicker">Checkout</p>
-          <h1>Pay Page</h1>
+          <h1>Checkout</h1>
           <p className="pay-page__subtitle">
-            Completa el envío y confirma tu compra.
+            Complete your shipping details and confirm your purchase.
           </p>
         </div>
 
         <div className="pay-page__wizard">
           <div className="pay-page__step-indicator">
-            <div className={step === 1 ? "active" : ""}>1. Envío</div>
-            <div className={step === 2 ? "active" : ""}>2. Confirmar</div>
+            <div className={step === 1 ? "active" : ""}>1. Shipping</div>
+            <div className={step === 2 ? "active" : ""}>2. Confirm</div>
           </div>
 
           {step === 1 && (
             <section className="pay-page__panel">
-              <h2 className="pay-page__panel-title">Datos de envío</h2>
+              <h2 className="pay-page__panel-title">Shipping details</h2>
 
               <div className="grid-2">
                 <label className="field">
-                  <span>Nombre *</span>
+                  <span>First name *</span>
                   <input
                     value={shipping.firstName}
                     onChange={(e) =>
                       handleShippingChange("firstName", e.target.value)
                     }
-                    placeholder="Tu nombre"
+                    placeholder="Your first name"
                   />
                   {shippingErrors.firstName && (
                     <span className="error">{shippingErrors.firstName}</span>
@@ -171,13 +177,13 @@ function PayPage() {
                 </label>
 
                 <label className="field">
-                  <span>Apellido *</span>
+                  <span>Last name *</span>
                   <input
                     value={shipping.lastName}
                     onChange={(e) =>
                       handleShippingChange("lastName", e.target.value)
                     }
-                    placeholder="Tu apellido"
+                    placeholder="Your last name"
                   />
                   {shippingErrors.lastName && (
                     <span className="error">{shippingErrors.lastName}</span>
@@ -202,13 +208,13 @@ function PayPage() {
                 </label>
 
                 <label className="field">
-                  <span>Teléfono *</span>
+                  <span>Phone *</span>
                   <input
                     value={shipping.phone}
                     onChange={(e) =>
                       handleShippingChange("phone", e.target.value)
                     }
-                    placeholder="Ej: 555123456"
+                    placeholder="e.g. 555123456"
                   />
                   {shippingErrors.phone && (
                     <span className="error">{shippingErrors.phone}</span>
@@ -217,13 +223,13 @@ function PayPage() {
               </div>
 
               <label className="field">
-                <span>Dirección *</span>
+                <span>Address *</span>
                 <input
                   value={shipping.address1}
                   onChange={(e) =>
                     handleShippingChange("address1", e.target.value)
                   }
-                  placeholder="Calle y número"
+                  placeholder="Street and number"
                 />
                 {shippingErrors.address1 && (
                   <span className="error">{shippingErrors.address1}</span>
@@ -231,25 +237,25 @@ function PayPage() {
               </label>
 
               <label className="field">
-                <span>Depto / Piso (opcional)</span>
+                <span>Apt / suite (optional)</span>
                 <input
                   value={shipping.address2}
                   onChange={(e) =>
                     handleShippingChange("address2", e.target.value)
                   }
-                  placeholder="Opcional"
+                  placeholder="Optional"
                 />
               </label>
 
               <div className="grid-3">
                 <label className="field">
-                  <span>Ciudad *</span>
+                  <span>City *</span>
                   <input
                     value={shipping.city}
                     onChange={(e) =>
                       handleShippingChange("city", e.target.value)
                     }
-                    placeholder="Ciudad"
+                    placeholder="City"
                   />
                   {shippingErrors.city && (
                     <span className="error">{shippingErrors.city}</span>
@@ -257,13 +263,13 @@ function PayPage() {
                 </label>
 
                 <label className="field">
-                  <span>País *</span>
+                  <span>Country *</span>
                   <input
                     value={shipping.country}
                     onChange={(e) =>
                       handleShippingChange("country", e.target.value)
                     }
-                    placeholder="País"
+                    placeholder="Country"
                   />
                   {shippingErrors.country && (
                     <span className="error">{shippingErrors.country}</span>
@@ -271,7 +277,7 @@ function PayPage() {
                 </label>
 
                 <label className="field">
-                  <span>Código postal *</span>
+                  <span>Postal code *</span>
                   <input
                     value={shipping.postalCode}
                     onChange={(e) =>
@@ -287,10 +293,10 @@ function PayPage() {
 
               <div className="pay-page__actions">
                 <button className="btn secondary" type="button" disabled>
-                  Cancelar
+                  Cancel
                 </button>
                 <button className="btn" type="button" onClick={handleNext}>
-                  Siguiente
+                  Next
                 </button>
               </div>
             </section>
@@ -298,34 +304,34 @@ function PayPage() {
 
           {step === 2 && (
             <section className="pay-page__panel">
-              <h2 className="pay-page__panel-title">Confirmar compra</h2>
+              <h2 className="pay-page__panel-title">Confirm purchase</h2>
 
               <div className="summary">
                 <div className="summary__section">
-                  <h3>Resumen</h3>
+                  <h3>Summary</h3>
                   <div className="summary__items">
                     {summary.items.map((it) => (
                       <div key={it.id} className="summary__row">
                         <div>
                           <div className="summary__name">{it.name}</div>
                           <div className="summary__meta">
-                            Cantidad: {it.qty}
+                            Qty: {it.qty}
                           </div>
                         </div>
-                        <div className="summary__price">${it.price}.00 USD</div>
+                        <div className="summary__price">{formatUsd(it.lineTotal)}</div>
                       </div>
                     ))}
                     <div className="summary__row total">
                       <div className="summary__name">Total</div>
                       <div className="summary__price">
-                        ${summary.total}.00 USD
+                        {formatUsd(summary.total)}
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="summary__section">
-                  <h3>Envío</h3>
+                  <h3>Shipping</h3>
                   <div className="ship">
                     <div>
                       {shipping.firstName} {shipping.lastName}
@@ -349,8 +355,8 @@ function PayPage() {
                   onChange={(e) => setConfirmed(e.target.checked)}
                 />
                 <span>
-                  Confirmo que mis datos de envío son correctos y acepto
-                  realizar el pago de <b>${summary.total}.00 USD</b>.
+                  I confirm my shipping details are correct and I agree to pay{" "}
+                  <b>{formatUsd(summary.total)}</b>.
                 </span>
               </label>
 
@@ -364,14 +370,14 @@ function PayPage() {
                   type="button"
                   onClick={handleBack}
                 >
-                  Atrás
+                  Back
                 </button>
                 <button
                   className="btn"
                   type="button"
                   onClick={handleConfirmPurchase}
                 >
-                  Confirmar compra
+                  Confirm purchase
                 </button>
               </div>
             </section>

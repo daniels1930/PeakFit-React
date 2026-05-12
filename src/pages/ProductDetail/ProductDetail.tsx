@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import PageBackButton from "../../components/PageBackButton/PageBackButton";
+import { useCart } from "../../context/CartContext";
 import { catalogProductToWishlist, useWishlist } from "../../context/WishlistContext";
 import { useRequireLogin } from "../../hooks/useRequireLogin";
 import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
@@ -64,8 +65,10 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
 
 function ProductDetail() {
   const { productId } = useParams();
+  const navigate = useNavigate();
   const product = catalogProducts.find((item) => item.id === productId);
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addFromCatalog } = useCart();
   const requireLogin = useRequireLogin();
   const [selectedImage, setSelectedImage] = useState(0);
   const [question, setQuestion] = useState("");
@@ -77,6 +80,7 @@ function ProductDetail() {
   const [reviews, setReviews] = useState<ProductReview[]>(() =>
     product ? getInitialReviews(product.id) : []
   );
+  const [showAddedToCart, setShowAddedToCart] = useState(false);
 
   useEffect(() => {
     if (!product) {
@@ -88,7 +92,14 @@ function ProductDetail() {
     setQuestion("");
     setQuestionSent(false);
     setReviews(getInitialReviews(product.id));
+    setShowAddedToCart(false);
   }, [product]);
+
+  useEffect(() => {
+    if (!showAddedToCart) return;
+    const timerId = window.setTimeout(() => setShowAddedToCart(false), 2800);
+    return () => window.clearTimeout(timerId);
+  }, [showAddedToCart]);
 
   const relatedProducts = relatedCatalogProducts.filter((item) => item.id !== product?.id).slice(0, 8);
   const viewedProducts = catalogProducts
@@ -224,18 +235,30 @@ function ProductDetail() {
               type="button"
               onClick={() => {
                 if (!requireLogin("Sign in to shop and complete your purchase.")) return;
+                addFromCatalog(product);
+                navigate("/cart");
               }}
             >
               Shop Now <img src="/assets/images/hero/flecha.png" alt="" />
             </button>
             <button
-              className="pd-cart"
+              className={`pd-cart${showAddedToCart ? " pd-cart--added" : ""}`}
               type="button"
+              aria-live="polite"
               onClick={() => {
                 if (!requireLogin("Sign in to add items to your cart.")) return;
+                addFromCatalog(product);
+                setShowAddedToCart(true);
               }}
             >
-              Add to cart <img src="/assets/images/productos/shop_button.png" alt="" />
+              {showAddedToCart ? (
+                <span className="pd-cart-label">Added</span>
+              ) : (
+                <>
+                  <span className="pd-cart-label">Add to cart</span>
+                  <img src="/assets/images/productos/shop_button.png" alt="" />
+                </>
+              )}
             </button>
           </div>
         </section>

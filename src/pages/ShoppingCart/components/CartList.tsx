@@ -1,28 +1,22 @@
 import CartItem from "./CartItem";
-import "../styles/cartList.css";
-
-import product1 from "/assets/images/pages/ShoppingCart/m1.png";
-import product2 from "/assets/images/pages/ShoppingCart/m1.png";
+import "../styles/CartList.css";
+import { useCart } from "../../../context/CartContext";
 
 const CartList = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Set - Sports Top + High Impact Leggings",
-      price: 62,
-      image: product1,
-    },
-    {
-      id: 2,
-      name: "Sports jacket – Long sleeve with zipper",
-      price: 62,
-      image: product2,
-    },
-  ];
+  const { lines } = useCart();
+
+  if (lines.length === 0) {
+    return (
+      <div className="cart-list cart-list-empty">
+        <p>Your cart is empty.</p>
+        <p className="cart-list-empty-hint">Browse products and tap “Add to cart” on any item.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="cart-list">
-      {products.map((item) => (
+      {lines.map((item) => (
         <CartItem key={item.id} item={item} />
       ))}
     </div>

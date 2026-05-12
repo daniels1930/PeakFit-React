@@ -40,6 +40,35 @@
   font-weight: 800;
 }
 
+.payment-success-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.payment-success-page__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border-radius: 10px;
+  background: #d9ff00;
+  color: #111;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.payment-success-page__btn:hover {
+  filter: brightness(1.06);
+}
+
+.payment-success-page__btn--secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
 .payment-success-page__hint {
   margin-top: 18px;
   opacity: 0.95;

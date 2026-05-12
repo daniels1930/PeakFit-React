@@ -219,6 +219,21 @@
   object-fit: contain;
 }
 
+.pd-cart-label {
+  display: inline-block;
+}
+
+.pd-cart--added {
+  background: #c8f070;
+  color: #0a2400;
+  pointer-events: auto;
+}
+
+.pd-cart--added .pd-cart-label::after {
+  content: " ✓";
+  font-weight: 900;
+}
+
 .pd-section {
   margin-top: 56px;
 }
