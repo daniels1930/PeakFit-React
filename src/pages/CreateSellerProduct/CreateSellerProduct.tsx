@@ -37,9 +37,11 @@ function CreateSellerProduct() {
 
   function manejarImagen(e: React.ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0];
-    if (archivo) {
-      setImagen(URL.createObjectURL(archivo));
-    }
+    if (!archivo) return;
+
+    const reader = new FileReader();
+    reader.onload = () => setImagen(reader.result as string);
+    reader.readAsDataURL(archivo);
   }
 
   function guardar() {

@@ -1,6 +1,6 @@
 // Guarda los productos y tiene funciones para agregar y editar
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 export interface Producto {
   id: number;
@@ -18,6 +18,7 @@ interface ProductContextType {
 }
 
 const ProductContext = createContext<ProductContextType | null>(null);
+const PRODUCTS_KEY = 'peakfit_seller_products';
 
 export function useProductos() {
   const ctx = useContext(ProductContext);
@@ -44,8 +45,32 @@ const productosIniciales: Producto[] = [
   },
 ];
 
+function leerProductos(): Producto[] {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if (!raw) return productosIniciales;
+    const parsed = JSON.parse(raw) as Producto[];
+    if (!Array.isArray(parsed)) return productosIniciales;
+    return parsed.filter(
+      (p) =>
+        typeof p?.id === 'number' &&
+        typeof p.fecha === 'string' &&
+        typeof p.nombre === 'string' &&
+        typeof p.precio === 'number' &&
+        (p.estado === 'sold' || p.estado === 'unsold') &&
+        typeof p.imagen === 'string'
+    );
+  } catch {
+    return productosIniciales;
+  }
+}
+
 export function ProductProvider({ children }: { children: ReactNode }) {
-  const [productos, setProductos] = useState<Producto[]>(productosIniciales);
+  const [productos, setProductos] = useState<Producto[]>(() => leerProductos());
+
+  useEffect(() => {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(productos));
+  }, [productos]);
 
   // Agrega un producto nuevo al inicio de la lista
   function agregarProducto(nombre: string, precio: number, imagen: string) {

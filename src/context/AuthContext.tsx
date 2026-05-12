@@ -128,8 +128,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateUser = useCallback((data: AuthUser) => {
     saveSession(data);
+    const registered = getRegisteredUsers();
+    const updatedUsers = registered.map((storedUser) =>
+      storedUser.email.toLowerCase() === user?.email.toLowerCase()
+        ? { ...storedUser, name: data.name, email: data.email, photo: data.photo }
+        : storedUser
+    );
+    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
     setUser(data);
-  }, []);
+  }, [user?.email]);
 
   const value = useMemo(
     () => ({ user, isAuthReady, login, register, logout, updateUser }),

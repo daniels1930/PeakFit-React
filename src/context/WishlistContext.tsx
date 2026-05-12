@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -20,10 +21,28 @@ type WishlistContextType = {
   isInWishlist: (id: string) => boolean;
 };
 
+const WISHLIST_KEY = "peakfit_wishlist";
+
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
+function readWishlist(): WishlistProduct[] {
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as WishlistProduct[];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item) => item?.id && item?.name && item?.image && item?.price);
+  } catch {
+    return [];
+  }
+}
+
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistProduct[]>([]);
+  const [items, setItems] = useState<WishlistProduct[]>(() => readWishlist());
+
+  useEffect(() => {
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
+  }, [items]);
 
   const toggleWishlist = useCallback((producto: WishlistProduct) => {
     setItems((prev) => {
