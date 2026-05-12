@@ -1,9 +1,21 @@
 import "../styles/MotivationSection.css";
 import ReusableButton from "./ReusableButton";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 const MotivationSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const goSellOrLogin = () => {
+    if (user) {
+      navigate("/seller-product/new");
+      return;
+    }
+    navigate("/login", {
+      state: { guestNotice: "Sign in to list your products and sell on PeakFit." },
+    });
+  };
 
   return (
     <section className="motivation-section">
@@ -69,11 +81,7 @@ const MotivationSection = () => {
         </video>
 
         <div className="motivation-button">
-          <ReusableButton
-            text="Start selling today"
-            width="350px"
-            onClick={() => navigate("/sell")}
-          />
+          <ReusableButton text="Start selling today" width="350px" onClick={goSellOrLogin} />
         </div>
       </div>
     </section>

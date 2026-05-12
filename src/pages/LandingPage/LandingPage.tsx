@@ -1,9 +1,9 @@
 import "./LandingPage.css";
 
-import HeroSection from "./components/HeroSection";
-import AboutSection from "./components/AboutSection";
-import OfferSection from "./components/OfferSection";
-import MotivationSection from "./components/MotivationSection";
+import HeroSection from "./Components/HeroSection";
+import AboutSection from "./Components/AboutSection";
+import OfferSection from "./Components/OfferSection";
+import MotivationSection from "./Components/MotivationSection";
 
 const LandingPage = () => {
   return (

@@ -107,6 +107,18 @@
   font-size: 0.95rem;
 }
 
+.login-guest-notice {
+  text-align: center;
+  color: #d9ff00;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: -12px 0 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(217, 255, 0, 0.12);
+  border: 1px solid rgba(217, 255, 0, 0.35);
+}
+
 .login-form {
   display: flex;
   flex-direction: column;

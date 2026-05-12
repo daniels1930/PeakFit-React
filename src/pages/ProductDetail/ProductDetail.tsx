@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import PageBackButton from "../../components/PageBackButton/PageBackButton";
 import { catalogProductToWishlist, useWishlist } from "../../context/WishlistContext";
+import { useRequireLogin } from "../../hooks/useRequireLogin";
 import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
 import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
@@ -20,6 +21,7 @@ function Stars({ rating }: { rating: number }) {
 
 function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const requireLogin = useRequireLogin();
   const liked = isInWishlist(product.id);
 
   return (
@@ -34,6 +36,7 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
+            if (!requireLogin("Sign in to save items to your wishlist.")) return;
             toggleWishlist(catalogProductToWishlist(product));
           }}
         >
@@ -63,6 +66,7 @@ function ProductDetail() {
   const { productId } = useParams();
   const product = catalogProducts.find((item) => item.id === productId);
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const requireLogin = useRequireLogin();
   const [selectedImage, setSelectedImage] = useState(0);
   const [question, setQuestion] = useState("");
   const [questionSent, setQuestionSent] = useState(false);
@@ -105,8 +109,8 @@ function ProductDetail() {
         <p className="page-kicker">PeakFit product</p>
         <h1>Product not found</h1>
         <p>This product is not available in the catalog.</p>
-        <Link className="page-action" to="/">
-          Back home
+        <Link className="page-action" to="/home">
+          Back to shop
         </Link>
       </main>
     );
@@ -180,7 +184,10 @@ function ProductDetail() {
               className="pd-heart"
               type="button"
               aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
-              onClick={() => toggleWishlist(catalogProductToWishlist(product))}
+              onClick={() => {
+                if (!requireLogin("Sign in to save items to your wishlist.")) return;
+                toggleWishlist(catalogProductToWishlist(product));
+              }}
             >
               <img
                 src={
@@ -212,10 +219,22 @@ function ProductDetail() {
               </ul>
             </div>
 
-            <button className="pd-shop" type="button">
+            <button
+              className="pd-shop"
+              type="button"
+              onClick={() => {
+                if (!requireLogin("Sign in to shop and complete your purchase.")) return;
+              }}
+            >
               Shop Now <img src="/assets/images/hero/flecha.png" alt="" />
             </button>
-            <button className="pd-cart" type="button">
+            <button
+              className="pd-cart"
+              type="button"
+              onClick={() => {
+                if (!requireLogin("Sign in to add items to your cart.")) return;
+              }}
+            >
               Add to cart <img src="/assets/images/productos/shop_button.png" alt="" />
             </button>
           </div>

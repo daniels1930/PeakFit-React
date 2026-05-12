@@ -1,9 +1,21 @@
 import "../styles/AboutSection.css";
 import ReusableButton from "./ReusableButton";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 const AboutSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const goShopOrLogin = () => {
+    if (user) {
+      navigate("/categories");
+      return;
+    }
+    navigate("/login", {
+      state: { guestNotice: "Sign in to shop and complete your purchases on PeakFit." },
+    });
+  };
 
   return (
     <section className="about-section">
@@ -41,10 +53,7 @@ const AboutSection = () => {
       </div>
 
       <div className="about-button">
-        <ReusableButton
-          text="Shop now"
-          onClick={() => navigate("/categories")}
-        />
+        <ReusableButton text="Shop now" onClick={goShopOrLogin} />
       </div>
     </section>
   );

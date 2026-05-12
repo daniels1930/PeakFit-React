@@ -1,11 +1,19 @@
 import { type FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Login.css";
+
+type LoginLocationState = {
+  guestNotice?: string;
+  from?: string;
+};
 
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const locationState = location.state as LoginLocationState | null;
+  const guestNotice = locationState?.guestNotice;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,7 +23,10 @@ function Login() {
     setError("");
     const ok = login(email, password);
     if (ok) {
-      navigate("/", { replace: true });
+      const from = locationState?.from;
+      const target =
+        from && from.startsWith("/") && !from.startsWith("//") && from !== "/login" ? from : "/home";
+      navigate(target, { replace: true });
     } else {
       setError("Incorrect email or password.");
     }
@@ -44,6 +55,12 @@ function Login() {
           <p className="login-subtitle">
             sign in to your account
           </p>
+
+          {guestNotice ? (
+            <p className="login-guest-notice" role="status">
+              {guestNotice}
+            </p>
+          ) : null}
 
           <form className="login-form" onSubmit={handleSubmit}>
             <label htmlFor="login-email">Email</label>

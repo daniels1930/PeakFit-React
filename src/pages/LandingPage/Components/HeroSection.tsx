@@ -1,9 +1,21 @@
 import "../styles/HeroSection.css";
 import ReusableButton from "./ReusableButton";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const goShopOrLogin = () => {
+    if (user) {
+      navigate("/categories");
+      return;
+    }
+    navigate("/login", {
+      state: { guestNotice: "Sign in to shop and complete your purchases on PeakFit." },
+    });
+  };
 
   return (
     <section className="hero-section">
@@ -30,11 +42,7 @@ const HeroSection = () => {
             <span>PEAK</span> POTENTIAL
           </h1>
 
-          <ReusableButton
-            text="Shop Now"
-            width="260px"
-            onClick={() => navigate("/categories")}
-          />
+          <ReusableButton text="Shop Now" width="260px" onClick={goShopOrLogin} />
 
           {/* GLASS */}
           <div className="hero-glass">
@@ -93,7 +101,7 @@ const HeroSection = () => {
         <ReusableButton
           text="Explore trending products"
           width="420px"
-          onClick={() => navigate("/categories")}
+          onClick={() => navigate("/home")}
         />
       </div>
     </section>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MainLayout from "../layouts/MainLayout";
 import Categories from "../pages/Categories/Categories";
@@ -26,11 +26,21 @@ import WomenCollection from "../pages/WomenCollection/WomenCollection";
 
 function RequireAuth() {
   const { user, isAuthReady } = useAuth();
+  const location = useLocation();
   if (!isAuthReady) {
     return null;
   }
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{
+          from: `${location.pathname}${location.search}`,
+          guestNotice: "Sign in to access this page.",
+        }}
+      />
+    );
   }
   return <Outlet />;
 }
@@ -41,7 +51,7 @@ function GuestOnly({ children }: { children: ReactNode }) {
     return null;
   }
   if (user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
   return <>{children}</>;
 }
@@ -66,11 +76,20 @@ function AppRouter() {
         }
       />
 
-      <Route element={<RequireAuth />}>
-        <Route path="/logout" element={<Logout />} />
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/landing" element={<LandingPage />} />
+      <Route path="/logout" element={<Logout />} />
+
+      <Route element={<MainLayout />}>
+        <Route index element={<LandingPage />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/search" element={<SearchResults />} />
+        <Route path="/collections/women" element={<WomenCollection />} />
+        <Route path="/collections/men" element={<MenCollection />} />
+        <Route path="/products/:productId" element={<ProductDetail />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/:categorySlug" element={<Categories />} />
+
+        <Route element={<RequireAuth />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/wishlist" element={<Wishlist />} />
@@ -79,17 +98,11 @@ function AppRouter() {
           <Route path="/my-products" element={<SellerProduct />} />
           <Route path="/pay" element={<PayPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/search" element={<SearchResults />} />
           <Route path="/cart" element={<ShoppingCart />} />
           <Route path="/seller-product" element={<SellerProduct />} />
           <Route path="/seller-product/new" element={<CreateSellerProduct />} />
           <Route path="/create-seller-product" element={<CreateSellerProduct />} />
           <Route path="/create-seller-product/:id" element={<CreateSellerProduct />} />
-          <Route path="/collections/women" element={<WomenCollection />} />
-          <Route path="/collections/men" element={<MenCollection />} />
-          <Route path="/products/:productId" element={<ProductDetail />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/categories/:categorySlug" element={<Categories />} />
         </Route>
       </Route>
 

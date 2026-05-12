@@ -1,6 +1,7 @@
 import { type MouseEvent, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
+import { useRequireLogin } from "../../hooks/useRequireLogin";
 import { categoryProducts } from "../../data/categoryProducts";
 import "./Categories.css";
 
@@ -28,6 +29,7 @@ const categoryInfo = {
 
 function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const requireLogin = useRequireLogin();
   const [imgIndex, setImgIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
 
@@ -68,6 +70,7 @@ function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
           aria-label="Add to wishlist"
           onClick={(event) => {
             event.stopPropagation();
+            if (!requireLogin("Sign in to save items to your wishlist.")) return;
             toggleWishlist(wishlistItem);
           }}
         >

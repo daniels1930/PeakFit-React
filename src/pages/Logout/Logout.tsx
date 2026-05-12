@@ -1,14 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./Logout.css";
 
 function Logout() {
-  const { logout } = useAuth();
+  const { user, logout, isAuthReady } = useAuth();
   const navigate = useNavigate();
 
+  if (!isAuthReady) {
+    return null;
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
-    <main className="logout-page">
-      <img
+    <main className="logout-page">      <img
         src="/assets/images/pages/Login/login-image.png"
         alt="Background"
         className="logout-background"
@@ -43,7 +50,7 @@ function Logout() {
             className="logout-btn logout-btn-confirm"
             onClick={() => {
               logout();
-              navigate("/login", { replace: true });
+              navigate("/", { replace: true });
             }}
           >
             log out

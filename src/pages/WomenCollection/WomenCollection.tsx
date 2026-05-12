@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
+import { useRequireLogin } from "../../hooks/useRequireLogin";
 import { womenProducts } from "../../data/womenProducts";
 import "./WomenCollection.css";
 
@@ -20,6 +21,7 @@ const emptyMessages: Record<Exclude<FilterTab, "all">, string> = {
 
 function ProductCard({ product }: { product: typeof womenProducts[0] }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const requireLogin = useRequireLogin();
   const [imgIndex, setImgIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
 
@@ -59,6 +61,7 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
           aria-label="Add to wishlist"
           onClick={(e) => {
             e.stopPropagation();
+            if (!requireLogin("Sign in to save items to your wishlist.")) return;
             toggleWishlist(wishlistItem);
           }}
         >
