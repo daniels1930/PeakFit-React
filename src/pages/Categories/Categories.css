@@ -335,6 +335,7 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .cat-card-price {
@@ -398,6 +399,10 @@
 }
 
 @media (max-width: 480px) {
+  .cat-picker-card h2 {
+    font-size: 42px;
+  }
+
   .cat-hero-title {
     font-size: 44px;
   }
