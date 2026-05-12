@@ -8,6 +8,32 @@ import { catalogProducts, relatedCatalogProducts } from "../../data/productCatal
 import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
 
+const REVIEWS_KEY_PREFIX = "peakfit_product_reviews";
+
+function getReviewsKey(productId: string) {
+  return `${REVIEWS_KEY_PREFIX}_${productId}`;
+}
+
+function readProductReviews(productId: string): ProductReview[] {
+  try {
+    const raw = localStorage.getItem(getReviewsKey(productId));
+    if (!raw) return getInitialReviews(productId);
+    const parsed = JSON.parse(raw) as ProductReview[];
+    if (!Array.isArray(parsed)) return getInitialReviews(productId);
+    return parsed.filter(
+      (review) =>
+        typeof review?.id === "string" &&
+        typeof review.author === "string" &&
+        typeof review.date === "string" &&
+        typeof review.rating === "number" &&
+        typeof review.title === "string" &&
+        typeof review.body === "string"
+    );
+  } catch {
+    return getInitialReviews(productId);
+  }
+}
+
 function Stars({ rating }: { rating: number }) {
   return (
     <span className="pd-stars" aria-label={`${rating} out of 5 stars`}>
@@ -78,7 +104,7 @@ function ProductDetail() {
   const [reviewBody, setReviewBody] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
   const [reviews, setReviews] = useState<ProductReview[]>(() =>
-    product ? getInitialReviews(product.id) : []
+    product ? readProductReviews(product.id) : []
   );
   const [showAddedToCart, setShowAddedToCart] = useState(false);
 
@@ -91,7 +117,7 @@ function ProductDetail() {
     setSelectedImage(0);
     setQuestion("");
     setQuestionSent(false);
-    setReviews(getInitialReviews(product.id));
+    setReviews(readProductReviews(product.id));
     setShowAddedToCart(false);
   }, [product]);
 
@@ -156,7 +182,11 @@ function ProductDetail() {
       body: reviewBody.trim(),
     };
 
-    setReviews((currentReviews) => [newReview, ...currentReviews]);
+    setReviews((currentReviews) => {
+      const nextReviews = [newReview, ...currentReviews];
+      localStorage.setItem(getReviewsKey(product.id), JSON.stringify(nextReviews));
+      return nextReviews;
+    });
     setReviewName("");
     setReviewTitle("");
     setReviewBody("");
