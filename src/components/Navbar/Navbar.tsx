@@ -1,5 +1,7 @@
-import { Link, NavLink } from "react-router-dom";
+import { type FormEvent, useMemo, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { normalizeSearch, searchCatalogProducts } from "../../data/searchProducts";
 import "./Navbar.css";
 
 const quickLinks = [
@@ -18,6 +20,30 @@ const navLinks = [
 
 function Navbar() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const normalizedSearch = normalizeSearch(searchTerm);
+  const searchResults = useMemo(() => {
+    return searchCatalogProducts(normalizedSearch).slice(0, 5);
+  }, [normalizedSearch]);
+
+  const showSearchPanel = Boolean(normalizedSearch) && (searchFocused || hasSearched);
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setHasSearched(true);
+
+    if (!normalizedSearch) {
+      return;
+    }
+
+    setSearchFocused(false);
+    navigate(`/search?q=${encodeURIComponent(normalizedSearch)}`);
+  };
+
   return (
     <header className="header">
       <div className="top-header">
@@ -25,11 +51,54 @@ function Navbar() {
           <img src="/assets/images/Header/Logo.png" alt="PeakFit" />
         </Link>
 
-        <form className="search-box">
-          <input type="search" placeholder="Search products and more....." aria-label="Search products" />
+        <form className="search-box" onSubmit={handleSearch}>
+          <input
+            type="search"
+            placeholder="Search products and more....."
+            aria-label="Search products"
+            value={searchTerm}
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
+              setHasSearched(false);
+            }}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => {
+              window.setTimeout(() => setSearchFocused(false), 120);
+            }}
+          />
           <button type="submit" aria-label="Search">
             <img src="/assets/images/Header/Lupa.png" alt="" />
           </button>
+
+          {showSearchPanel && (
+            <div className="search-panel">
+              {searchResults.length > 0 ? (
+                <>
+                  {searchResults.map((product) => (
+                    <Link
+                      className="search-result"
+                      key={product.id}
+                      to={`/products/${product.id}`}
+                    >
+                      <img src={product.images[0]} alt="" />
+                      <span>
+                        <strong>{product.name}</strong>
+                        <small>{product.collection} - {product.price}</small>
+                      </span>
+                    </Link>
+                  ))}
+                  <Link
+                    className="search-all-results"
+                    to={`/search?q=${encodeURIComponent(normalizedSearch)}`}
+                  >
+                    View all results for "{searchTerm.trim()}"
+                  </Link>
+                </>
+              ) : (
+                <p className="search-empty">No products found</p>
+              )}
+            </div>
+          )}
         </form>
 
         <div className="icons">

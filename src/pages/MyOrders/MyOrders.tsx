@@ -1,41 +1,8 @@
+import { Link } from 'react-router-dom';
 import PageBackButton from '../../components/PageBackButton/PageBackButton';
+import { myOrders } from '../../data/myOrders';
 import './MyOrders.css';
 import '../Wishlist/Wishlist.css';
-
-const pedidos = [
-  {
-    id: 1,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto1.jpg',
-  },
-  {
-    id: 2,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto2.jpg',
-  },
-  {
-    id: 3,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto3.jpg',
-  },
-  {
-    id: 4,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto4.jpg',
-  },
-];
 
 function MyOrders() {
   return (
@@ -53,33 +20,33 @@ function MyOrders() {
       </section>
 
       <section className="wishlist-grid">
-        {pedidos.map((p) => (
+        {myOrders.map((p) => (
           <article key={p.id} className="mo-tarjeta">
-            <p className="mo-fecha">{p.fecha}</p>
+            <p className="mo-fecha">{p.purchaseDate}</p>
 
             <div className="mo-tarjeta-fila">
               <img
-                src={p.imagen}
-                alt={p.nombre}
+                src={p.line.image}
+                alt={p.line.name}
                 className="mo-imagen"
               />
 
               <div className="mo-info">
                 <p className="mo-estado">
-                  {p.estado}{' '}
+                  {p.status}{' '}
                   <span className="mo-check">✓</span>
                 </p>
-                <p className="mo-llegada">{p.llegada}</p>
-                <p className="mo-nombre-prod">{p.nombre}</p>
+                <p className="mo-llegada">{p.deliverySummary}</p>
+                <p className="mo-nombre-prod">{p.line.name}</p>
               </div>
 
               <div className="mo-acciones">
-                <button type="button" className="mo-btn-accion mo-btn-ver">
+                <Link to={`/my-orders/${p.id}`} className="mo-btn-accion mo-btn-ver">
                   View purchase
-                </button>
-                <button type="button" className="mo-btn-accion mo-btn-recomprar">
+                </Link>
+                <Link to={`/products/${p.line.productId}`} className="mo-btn-accion mo-btn-recomprar">
                   Repurchase
-                </button>
+                </Link>
               </div>
             </div>
           </article>

@@ -87,6 +87,9 @@
 }
 
 .mo-btn-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 16px;
   border-radius: 5px;
   font-size: 0.82rem;
@@ -95,6 +98,8 @@
   border: none;
   min-width: 130px;
   font-family: 'Poppins', sans-serif;
+  text-align: center;
+  text-decoration: none;
 }
 
 .mo-btn-ver {

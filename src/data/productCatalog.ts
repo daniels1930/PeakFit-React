@@ -89,11 +89,91 @@ const categoryCatalogProducts: CatalogProduct[] = categoryProducts.map((product)
         ],
 }));
 
+const orderCatalogProducts: CatalogProduct[] = [
+  {
+    id: "order-product-1",
+    name: "Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black",
+    price: "$120.00 USD",
+    category: "equipment",
+    collection: "Equipment",
+    description: "A professional strength training dumbbell designed for stable grip, durable use, and focused workouts.",
+    images: [
+      "/assets/images/pages/MyOrders/producto1.jpg",
+      "/assets/images/pages/MyOrders/producto1.jpg",
+      "/assets/images/pages/MyOrders/producto1.jpg",
+    ],
+    highlights: [
+      "Hex shape helps reduce rolling between sets",
+      "Chrome handle supports a firm training grip",
+      "Rubber coating protects floors and equipment",
+      "Built for strength routines at home or in the gym",
+    ],
+  },
+  {
+    id: "order-product-2",
+    name: "Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black",
+    price: "$24.00 USD",
+    category: "equipment",
+    collection: "Equipment",
+    description: "A compact strength tool made for controlled push-up and upper body training sessions.",
+    images: [
+      "/assets/images/pages/MyOrders/producto2.jpg",
+      "/assets/images/pages/MyOrders/producto2.jpg",
+      "/assets/images/pages/MyOrders/producto2.jpg",
+    ],
+    highlights: [
+      "Stable frame for controlled reps",
+      "Compact profile for easy storage",
+      "Non-slip contact points for training confidence",
+      "Useful for chest, shoulder, and arm work",
+    ],
+  },
+  {
+    id: "order-product-3",
+    name: "Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black",
+    price: "$22.00 USD",
+    category: "accessories",
+    collection: "Accessories",
+    description: "A PeakFit accessory selected from your previous order and ready to buy again.",
+    images: [
+      "/assets/images/pages/MyOrders/producto3.jpg",
+      "/assets/images/pages/MyOrders/producto3.jpg",
+      "/assets/images/pages/MyOrders/producto3.jpg",
+    ],
+    highlights: [
+      "Matches the product from your order history",
+      "Easy to add back into your routine",
+      "Designed for everyday training support",
+      "Simple repurchase path from My Orders",
+    ],
+  },
+  {
+    id: "order-product-4",
+    name: "Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black",
+    price: "$48.00 USD",
+    category: "equipment",
+    collection: "Equipment",
+    description: "A training product from your purchase history, shown with the same image from the order card.",
+    images: [
+      "/assets/images/pages/MyOrders/producto4.jpg",
+      "/assets/images/pages/MyOrders/producto4.jpg",
+      "/assets/images/pages/MyOrders/producto4.jpg",
+    ],
+    highlights: [
+      "Connected directly to your order history",
+      "Uses the same product image from My Orders",
+      "Ready for quick repurchase",
+      "Made for structured strength and conditioning work",
+    ],
+  },
+];
+
 export const catalogProducts: CatalogProduct[] = [
   ...homeProducts,
   ...womenCatalogProducts,
   ...menCatalogProducts,
   ...categoryCatalogProducts,
+  ...orderCatalogProducts,
 ];
 
 export const relatedCatalogProducts = categoryCatalogProducts;

@@ -12,10 +12,12 @@ import Logout from "../pages/Logout/Logout";
 import MenCollection from "../pages/MenCollection/MenCollection";
 import MyOrders from "../pages/MyOrders/MyOrders";
 import NotFound from "../pages/NotFound/NotFound";
+import OrderDetail from "../pages/OrderDetail/OrderDetail";
 import PayPage from "../pages/PayPage/PayPage";
 import PaymentSuccess from "../pages/PaymentSuccess/PaymentSuccess";
 import ProductDetail from "../pages/ProductDetail/ProductDetail";
 import Profile from "../pages/Profile/Profile";
+import SearchResults from "../pages/SearchResults/SearchResults";
 import SellerProduct from "../pages/SellerProduct/SellerProduct";
 import ShoppingCart from "../pages/ShoppingCart/ShoppingCart";
 import SignUp from "../pages/SignUp/SignUp";
@@ -73,9 +75,11 @@ function AppRouter() {
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/my-orders/:orderId" element={<OrderDetail />} />
           <Route path="/my-products" element={<SellerProduct />} />
           <Route path="/pay" element={<PayPage />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/cart" element={<ShoppingCart />} />
           <Route path="/seller-product" element={<SellerProduct />} />
           <Route path="/seller-product/new" element={<CreateSellerProduct />} />
