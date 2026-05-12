@@ -45,12 +45,13 @@ function PayPage() {
 
   const [confirmed, setConfirmed] = useState(false);
   const [confirmError, setConfirmError] = useState<string>("");
+  const [paid, setPaid] = useState(false);
 
   useEffect(() => {
-    if (lines.length === 0) {
+    if (lines.length === 0 && !paid) {
       navigate("/cart", { replace: true });
     }
-  }, [lines.length, navigate]);
+  }, [lines.length, navigate, paid]);
 
   const summary = useMemo(
     () => ({
@@ -127,6 +128,7 @@ function PayPage() {
     }
 
     const paidTotal = summary.total;
+    setPaid(true);
     clearCart();
     navigate("/payment-success", {
       state: {
@@ -136,7 +138,7 @@ function PayPage() {
     });
   }
 
-  if (lines.length === 0) {
+  if (lines.length === 0 && !paid) {
     return null;
   }
 
