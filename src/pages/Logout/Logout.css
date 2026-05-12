@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.logout-page {
+  font-family: "Poppins", Arial, sans-serif;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logout-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.logout-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+  z-index: -1;
+}
+
+.logout-card {
+  width: min(100%, 440px);
+  padding: 34px 38px 30px;
+  border-radius: 18px;
+  background: rgba(24, 24, 24, 0.58);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  color: white;
+}
+
+.logout-logo {
+  width: 210px;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto 18px;
+}
+
+.logout-card h2 {
+  font-size: 2.35rem;
+  line-height: 1.05;
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+
+.logout-text {
+  font-size: 0.93rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 330px;
+  margin: 0 auto 28px;
+}
+
+.logout-text span {
+  color: #d9ff00;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.logout-actions {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+}
+
+.logout-btn {
+  min-width: 155px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 7px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logout-btn:hover {
+  transform: translateY(-1px);
+}
+
+.logout-btn-cancel {
+  background: #3a3a3a;
+  color: #f2f2f2;
+}
+
+.logout-btn-confirm {
+  background: #3a3a3a;
+  color: #f2f2f2;
+}
+
+@media (max-width: 520px) {
+  .logout-card {
+    width: calc(100% - 32px);
+    padding: 26px 20px 22px;
+  }
+
+  .logout-logo {
+    width: 170px;
+    margin-bottom: 14px;
+  }
+
+  .logout-card h2 {
+    font-size: 1.9rem;
+  }
+
+  .logout-text {
+    font-size: 0.88rem;
+    margin-bottom: 22px;
+  }
+
+  .logout-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}

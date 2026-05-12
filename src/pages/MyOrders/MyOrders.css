@@ -1,4 +1,135 @@
-.my-orders-page {
-  min-height: 70vh;
-  background: #0f0f12;
+@import url('https://fonts.googleapis.com/css2?family=Bayon&family=Poppins:wght@400;600;700;900&display=swap');
+
+.mo-tarjeta {
+  background: #f4f4f4;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  padding: 14px 18px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mo-tarjeta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+}
+
+.mo-fecha {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mo-tarjeta-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.mo-imagen {
+  width: 90px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  background-color: #ddd;
+  flex-shrink: 0;
+}
+
+.mo-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mo-estado {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mo-check {
+  color: #c8f500;
+  background: #111;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 0.75rem;
+}
+
+.mo-llegada {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mo-nombre-prod {
+  font-size: 0.85rem;
+  color: #444;
+  margin: 6px 0 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mo-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.mo-btn-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  min-width: 130px;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  text-decoration: none;
+}
+
+.mo-btn-ver {
+  background-color: #d9ff00;
+  color: #111;
+}
+
+.mo-btn-recomprar {
+  background-color: #8ab800;
+  color: #111;
+}
+
+@media (max-width: 760px) {
+  .mo-tarjeta-fila {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mo-imagen {
+    width: 100%;
+    height: 160px;
+  }
+
+  .mo-acciones {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .mo-btn-accion {
+    flex: 1;
+    min-width: 0;
+  }
 }

@@ -1,0 +1,33 @@
+.home-brand {
+  text-align: center;
+  padding: 40px 20px;
+  line-height: 1.6;
+  background: black;
+  color: white;
+}
+
+.home-brand-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-brand-logo img {
+  width: 600px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 900px) {
+  .home-brand-logo img {
+    width: 300px;
+  }
+}
+
+@media (max-width: 500px) {
+  .home-brand {
+    padding: 30px 10px;
+  }
+  .home-brand-logo img {
+    width: 150px;
+  }
+}

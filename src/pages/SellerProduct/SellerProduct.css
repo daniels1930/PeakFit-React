@@ -1,4 +1,211 @@
-.seller-product-page {
-  min-height: 70vh;
-  background: #130020;
+
+/* Bayón para títulos */
+@import url('https://fonts.googleapis.com/css2?family=Bayon&family=Poppins:wght@400;600;700;900&display=swap');
+
+.sp-page {
+  background-color: #12121f;
+  min-height: 100vh;
+  padding: 36px 60px 60px;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* MY PRODUCTS */
+.sp-titulo {
+  font-family: 'Bayon', sans-serif;
+  font-weight: 400; /* ← debe ser 400, no 900 */
+}
+.sp-verde {
+  color: #c8f500;
+}
+
+/*  Caja de CREATE PRODUCT */
+.sp-caja-crear {
+  display: flex;
+  background-color: #1c1c2e;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 200px;
+}
+
+.sp-crear-texto {
+  display: flex;
+  align-items: center;
+  padding: 30px 40px;
+  min-width: 260px;
+}
+
+/* CREATE PRODUCT */
+.sp-crear-texto h2 {
+  font-size: 2.6rem;
+  font-family: 'Bayon', sans-serif;
+  text-transform: uppercase;
+  line-height: 1.05;
+  margin: 0;
+  color: white;
+  font-weight: 400;
+}
+
+.sp-crear-derecha {
+  flex: 1;
+  background-color: #22223a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 30px;
+}
+
+.sp-icono {
+  width: 80px;
+  height: 80px;
+  opacity: 0.55;
+}
+
+/* "Create New Product */
+.sp-btn-crear {
+  background: transparent;
+  border: none;
+  color: #c8f500;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 1px;
+}
+
+.sp-btn-crear:hover {
+  opacity: 0.7;
+}
+
+.sp-linea {
+  height: 2px;
+  background-color: #2e2e45;
+  margin: 32px 0;
+}
+
+/* RECORD */
+.sp-caja-record {
+  background-color: #1c1c2e;
+  border-radius: 14px;
+  padding: 32px 36px;
+}
+
+.sp-record-titulo {
+  font-size: 3rem;
+  font-family: 'Bayon', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0 0 20px;
+  color: white;
+  font-weight: 400;
+}
+
+.sp-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sp-tarjeta {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #12121f;
+  border: 1px solid #2a2a40;
+}
+
+.sp-tarjeta-izq {
+  flex: 1;
+  padding: 14px 20px 18px;
+}
+
+/* Fecha */
+.sp-fecha {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #999;
+  margin: 0 0 12px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sp-fila {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.sp-imagen {
+  width: 108px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 6px;
+  background-color: #2e2e45;
+  flex-shrink: 0;
+}
+
+.sp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Nombre del producto */
+.sp-nombre {
+  font-size: 0.88rem;
+  color: #b0b0c0;
+  margin: 0;
+  max-width: 420px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Precio */
+.sp-precio {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Botón Edit product */
+.sp-btn-editar {
+  background: transparent;
+  border: 1.5px solid white;
+  color: white;
+  padding: 6px 20px;
+  border-radius: 5px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sp-btn-editar:hover {
+  background: white;
+  color: #12121f;
+}
+
+.sp-estado {
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.sp-sold {
+  background-color: #c8f500;
+  color: #12121f;
+}
+
+.sp-unsold {
+  background-color: #d94040;
+  color: white;
 }
