@@ -1,4 +1,3 @@
-/* Fuente Bayon */
 @import url('https://fonts.googleapis.com/css2?family=Bayon&family=Poppins:wght@400;600;700;900&display=swap');
 
 .csp-page {
@@ -8,6 +7,7 @@
   font-family: 'Poppins', sans-serif;
   color: white;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .csp-page > .page-back-btn {
@@ -18,10 +18,13 @@
   display: flex;
   gap: 50px;
   align-items: flex-start;
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  min-width: 0;
 }
 
 .csp-imagen-zona {
-  width: 480px;
+  width: min(42vw, 480px);
   height: 500px;
   background-color: #0d0d1a;
   border-radius: 10px;
@@ -59,9 +62,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
-/* NEW PRODUCT */
 .csp-titulo {
   font-size: 4rem;   
   font-family: 'Bayon', sans-serif;
@@ -80,7 +84,6 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* Inputs */
 .csp-input {
   background-color: rgba(255, 255, 255, 0.15);
   border: 1.5px solid #6a3a9a;
@@ -107,7 +110,6 @@
   width: 150px;
 }
 
-/* Textarea */
 .csp-textarea {
   background-color: rgba(255, 255, 255, 0.15);
   border: 1.5px solid #6a3a9a;
@@ -130,7 +132,6 @@
   border-color: #c8f500;
 }
 
-/* Botones New y Used */
 .csp-estado-botones {
   display: flex;
   gap: 12px;
@@ -153,7 +154,6 @@
   color: #111;
 }
 
-/* Botón Save changes */
 .csp-btn-guardar {
   background-color: #c8f500;
   color: #111;
@@ -171,4 +171,53 @@
 
 .csp-btn-guardar:hover {
   opacity: 0.85;
+}
+
+@media (max-width: 1050px) {
+  .csp-page {
+    padding: 24px 28px 48px;
+  }
+
+  .csp-contenido {
+    flex-direction: column;
+    gap: 28px;
+    width: min(100%, 720px);
+  }
+
+  .csp-imagen-zona {
+    width: 100%;
+    height: clamp(240px, 42vw, 340px);
+  }
+
+  .csp-titulo {
+    font-size: 2.6rem;
+  }
+
+  .csp-input-precio {
+    width: min(240px, 100%);
+  }
+}
+
+@media (max-width: 480px) {
+  .csp-page {
+    padding: 16px 16px 32px;
+  }
+
+  .csp-titulo {
+    font-size: 2rem;
+  }
+
+  .csp-estado-botones {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .csp-estado-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .csp-input-precio {
+    width: 100%;
+  }
 }

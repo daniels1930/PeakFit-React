@@ -38,6 +38,7 @@
   z-index: 3;
   padding: 0 60px;
   max-width: 560px;
+  min-width: 0;
 }
 
 .wc-hero-title {
@@ -168,6 +169,7 @@
 .wc-tabs {
   display: flex;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .wc-tab {
@@ -362,6 +364,7 @@
   font-size: 13px;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .wc-card-price {
@@ -485,12 +488,41 @@
     align-items: flex-start;
     padding: 14px 20px;
   }
+
+  .wc-tabs {
+    width: 100%;
+    gap: 6px;
+  }
+
+  .wc-tab {
+    padding: 8px 10px;
+  }
 }
 
 @media (max-width: 480px) {
+  .wc-hero {
+    min-height: 500px;
+  }
+
   .wc-hero-title {
     font-size: 40px;
   }
+
+  .wc-hero-sub {
+    max-width: 300px;
+  }
+
+  .wc-hero-btn {
+    width: min(100%, 300px);
+    justify-content: center;
+    padding: 16px 20px;
+  }
+
+  .wc-hero-next {
+    width: 42px;
+    height: 72px;
+  }
+
   .wc-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;

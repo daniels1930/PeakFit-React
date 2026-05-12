@@ -17,7 +17,7 @@
 
 .pd-hero-card {
   display: grid;
-  grid-template-columns: minmax(560px, 1.15fr) minmax(420px, 0.85fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
   overflow: hidden;
   border: 18px solid #270149;
   border-radius: 14px;
@@ -96,6 +96,7 @@
 .pd-summary {
   position: relative;
   padding: clamp(40px, 4vw, 64px);
+  min-width: 0;
 }
 
 .pd-heart {
@@ -161,6 +162,7 @@
   color: #303030;
   font-size: 15px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .pd-highlights h2 {
@@ -174,6 +176,7 @@
   color: #242424;
   font-size: 14px;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .pd-shop,
@@ -475,7 +478,7 @@
   font-weight: 500;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .pd-shell {
     width: min(100% - 32px, 760px);
   }
@@ -499,7 +502,8 @@
 
 @media (max-width: 640px) {
   .pd-shell {
-    padding: 20px 14px 60px;
+    width: min(100% - 28px, 760px);
+    padding: 20px 0 60px;
   }
 
   .pd-hero-card {
@@ -516,6 +520,15 @@
 
   .pd-main-image-frame {
     height: 340px;
+  }
+
+  .pd-thumbs button {
+    height: 72px;
+  }
+
+  .pd-carousel {
+    grid-auto-columns: minmax(210px, 74vw);
+    gap: 16px;
   }
 
   .pd-review-form,

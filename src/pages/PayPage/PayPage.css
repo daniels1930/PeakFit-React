@@ -25,6 +25,7 @@
 
 .pay-page__step-indicator {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   font-weight: 700;
@@ -102,6 +103,7 @@ input:focus {
 
 .pay-page__actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 18px;
@@ -210,5 +212,15 @@ input:focus {
 
   .pay-page__container {
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pay-page__panel {
+    padding: 18px;
+  }
+
+  .pay-page__actions .btn {
+    flex: 1 1 140px;
   }
 }

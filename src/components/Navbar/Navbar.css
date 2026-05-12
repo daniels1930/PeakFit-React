@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 60px;
-  gap: 10px;
+  gap: 12px;
 }
 
 .logo {
@@ -136,6 +136,8 @@
   display: flex;
   align-items: center;
   gap: 18px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .icons-guest-link {
@@ -281,7 +283,7 @@
   }
 
   .icons {
-    gap: 12px;
+    gap: 10px;
   }
 
   .icons img {
@@ -299,5 +301,32 @@
 
   .nav-links a {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .top-header {
+    align-items: flex-start;
+  }
+
+  .icons {
+    max-width: 210px;
+  }
+
+  .navbar-auth {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+    justify-content: flex-end;
+  }
+
+  .navbar-auth-btn {
+    padding: 7px 12px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    row-gap: 8px;
   }
 }

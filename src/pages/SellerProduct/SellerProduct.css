@@ -1,5 +1,3 @@
-
-/* Bayón para títulos */
 @import url('https://fonts.googleapis.com/css2?family=Bayon&family=Poppins:wght@400;600;700;900&display=swap');
 
 .sp-page {
@@ -9,18 +7,16 @@
   font-family: 'Poppins', sans-serif;
   color: white;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-/* MY PRODUCTS */
 .sp-titulo {
   font-family: 'Bayon', sans-serif;
-  font-weight: 400; /* ← debe ser 400, no 900 */
 }
 .sp-verde {
   color: #c8f500;
 }
 
-/*  Caja de CREATE PRODUCT */
 .sp-caja-crear {
   display: flex;
   background-color: #1c1c2e;
@@ -36,7 +32,6 @@
   min-width: 260px;
 }
 
-/* CREATE PRODUCT */
 .sp-crear-texto h2 {
   font-size: 2.6rem;
   font-family: 'Bayon', sans-serif;
@@ -64,7 +59,6 @@
   opacity: 0.55;
 }
 
-/* "Create New Product */
 .sp-btn-crear {
   background: transparent;
   border: none;
@@ -86,7 +80,6 @@
   margin: 32px 0;
 }
 
-/* RECORD */
 .sp-caja-record {
   background-color: #1c1c2e;
   border-radius: 14px;
@@ -120,9 +113,9 @@
 .sp-tarjeta-izq {
   flex: 1;
   padding: 14px 20px 18px;
+  min-width: 0;
 }
 
-/* Fecha */
 .sp-fecha {
   font-size: 0.82rem;
   font-weight: 600;
@@ -150,18 +143,18 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
-/* Nombre del producto */
 .sp-nombre {
   font-size: 0.88rem;
   color: #b0b0c0;
   margin: 0;
   max-width: 420px;
   font-family: 'Poppins', sans-serif;
+  overflow-wrap: anywhere;
 }
 
-/* Precio */
 .sp-precio {
   font-size: 1.55rem;
   font-weight: 700;
@@ -170,7 +163,6 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* Botón Edit product */
 .sp-btn-editar {
   background: transparent;
   border: 1.5px solid white;
@@ -208,4 +200,58 @@
 .sp-unsold {
   background-color: #d94040;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .sp-page {
+    padding: 24px 20px 40px;
+  }
+
+  .sp-caja-crear {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .sp-crear-texto {
+    min-width: unset;
+    padding: 20px 24px 10px;
+  }
+
+  .sp-crear-texto h2 {
+    font-size: 2rem;
+  }
+
+  .sp-crear-derecha {
+    padding: 20px 24px;
+  }
+
+  .sp-caja-record {
+    padding: 24px 16px;
+  }
+
+  .sp-record-titulo {
+    font-size: 2rem;
+  }
+
+  .sp-tarjeta {
+    flex-direction: column;
+  }
+
+  .sp-estado {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .sp-fila {
+    flex-direction: column;
+  }
+
+  .sp-imagen {
+    width: 100%;
+    height: 180px;
+  }
+
+  .sp-nombre {
+    max-width: 100%;
+  }
 }
