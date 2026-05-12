@@ -1,0 +1,55 @@
+.cart-container {
+  padding: 40px;
+  background: #000;
+  min-height: 100vh;
+  color: white;
+}
+
+.cart-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.cart-title-icon {
+  flex-shrink: 0;
+  display: block;
+}
+
+/* 🔥 GRID REAL COMO FIGMA */
+.cart-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 👈 CLAVE */
+  gap: 40px;
+  align-items: start;
+}
+
+/* 📱 TABLET */
+@media (max-width: 1024px) {
+  .cart-content {
+    grid-template-columns: 1.5fr 1fr;
+    gap: 20px;
+  }
+
+  .cart-title {
+    font-size: 32px;
+  }
+}
+
+/* 📱 MOBILE */
+@media (max-width: 768px) {
+  .cart-content {
+    grid-template-columns: 1fr; /* 👈 se apila */
+  }
+
+  .cart-container {
+    padding: 20px;
+  }
+
+  .cart-title {
+    font-size: 26px;
+  }
+}

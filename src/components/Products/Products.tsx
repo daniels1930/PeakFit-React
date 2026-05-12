@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { products } from "../../data/products";
+import { useRequireLogin } from "../../hooks/useRequireLogin";
 import "./Products.css";
 
 function Products() {
@@ -11,14 +12,14 @@ function Products() {
       <h2 className="titulo">Top sports sellers</h2>
 
       <ProductGrid products={firstRow} />
-      <button className="view-all" type="button">
+      <Link className="view-all" to="/collections/women">
         View all
-      </button>
+      </Link>
 
       <ProductGrid products={secondRow} />
-      <button className="view-all" type="button">
+      <Link className="view-all" to="/collections/men">
         View all
-      </button>
+      </Link>
 
       <div className="banner">BUY. SELL. TRAIN. GROW.</div>
 
@@ -34,6 +35,8 @@ type ProductGridProps = {
 };
 
 function ProductGrid({ products }: ProductGridProps) {
+  const requireLogin = useRequireLogin();
+
   return (
     <div className="grid">
       {products.map((product) => (
@@ -48,7 +51,14 @@ function ProductGrid({ products }: ProductGridProps) {
             <p className="precio">{product.price}</p>
           </div>
 
-          <button className="icono" type="button" aria-label={`Add ${product.name} to cart`}>
+          <button
+            className="icono"
+            type="button"
+            aria-label={`Add ${product.name} to cart`}
+            onClick={() => {
+              if (!requireLogin("Sign in to add items to your cart.")) return;
+            }}
+          >
             <img src="/assets/images/productos/shop_button.png" alt="" />
           </button>
         </article>

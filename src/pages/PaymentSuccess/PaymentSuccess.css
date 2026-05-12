@@ -3,3 +3,90 @@
   background: radial-gradient(circle at center, #d0ff00 0, #111 38%);
   color: white;
 }
+
+.payment-success-page__container {
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.payment-success-page__subtitle {
+  opacity: 0.9;
+  margin-bottom: 18px;
+}
+
+.payment-success-page__card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.payment-success-page__row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.payment-success-page__label {
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.payment-success-page__value {
+  font-weight: 800;
+}
+
+.payment-success-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.payment-success-page__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border-radius: 10px;
+  background: #d9ff00;
+  color: #111;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.payment-success-page__btn:hover {
+  filter: brightness(1.06);
+}
+
+.payment-success-page__btn--secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.payment-success-page__hint {
+  margin-top: 18px;
+  opacity: 0.95;
+  font-weight: 700;
+}
+
+.payment-success-page__address {
+  font-weight: 700;
+  line-height: 1.35;
+  opacity: 0.95;
+}
+
+@media (max-width: 700px) {
+  .payment-success-page__container {
+    padding: 20px;
+  }
+
+  .payment-success-page__row {
+    grid-template-columns: 1fr;
+  }
+}

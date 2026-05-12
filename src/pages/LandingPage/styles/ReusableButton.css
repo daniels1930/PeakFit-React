@@ -1,0 +1,38 @@
+.reusable-button {
+  background: #d0ff00;
+
+  color: black;
+
+  border: none;
+
+  min-height: 65px;
+
+  padding: 0 35px;
+
+  border-radius: 10px;
+
+  font-size: 1.1rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+}
+
+.reusable-button span {
+  transition: transform 0.3s ease;
+}
+
+.reusable-button:hover {
+  background-color: #86a400;
+}
+
+.reusable-button:hover span {
+  transform: translateX(5px);
+}

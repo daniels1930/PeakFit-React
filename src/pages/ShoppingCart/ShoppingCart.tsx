@@ -1,13 +1,27 @@
-import "./ShoppingCart.css";
+import "./styles/ShoppingCart.css";
+import CartList from "./components/CartList";
+import OrderSummary from "./components/OrderSummary";
 
-function ShoppingCart() {
+const ShoppingCart = () => {
   return (
-    <main className="shopping-cart-page page-workspace">
-      <p className="page-kicker">Persona 2</p>
-      <h1>Shopping Cart</h1>
-      <p>Carrito de compras con productos seleccionados.</p>
-    </main>
+    <div className="cart-container">
+      <h1 className="cart-title">
+        MY SHOPPING CART
+        <img
+          className="cart-title-icon"
+          src="/assets/images/pages/ShoppingCart/cart-title-icon.svg"
+          alt=""
+          width={40}
+          height={40}
+        />
+      </h1>
+
+      <div className="cart-content">
+        <CartList />
+        <OrderSummary />
+      </div>
+    </div>
   );
-}
+};
 
 export default ShoppingCart;

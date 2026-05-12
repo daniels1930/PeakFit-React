@@ -1,0 +1,50 @@
+.offer-section {
+  background: black;
+  color: white;
+}
+
+.offer-title {
+  background: #d0ff00;
+
+  padding: 5px 5%;
+}
+
+.offer-title h2 {
+  color: black;
+  margin: 0;
+  font-size: 5rem;
+  font-weight: 900;
+}
+
+.offer-image {
+  width: 100%;
+  display: block;
+
+  padding: 40px 5% 14px;
+}
+
+.offer-description {
+  padding: 5% 5% 0px;
+
+  font-size: 2rem;
+
+  line-height: 1.4;
+
+  max-width: 1200px;
+}
+.offer-description p {
+  padding: 0px;
+  margin: 0;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 992px) {
+  .offer-title h2 {
+    font-size: 3rem;
+  }
+
+  .offer-description {
+    font-size: 1.3rem;
+  }
+}

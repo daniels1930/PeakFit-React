@@ -1,138 +1,58 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import PageBackButton from '../../components/PageBackButton/PageBackButton';
+import { myOrders } from '../../data/myOrders';
 import './MyOrders.css';
-
-const pedidos = [
-  {
-    id: 1,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto1.jpg',
-  },
-  {
-    id: 2,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto2.jpg',
-  },
-  {
-    id: 3,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto3.jpg',
-  },
-  {
-    id: 4,
-    fecha: 'January 7, 2025',
-    estado: 'Delivered',
-    llegada: 'January 9th arrived',
-    nombre: 'Hex Rubber Dumbbell with Chrome Handle Non-Slip Grip Professional Strength Training Black',
-    imagen: '/assets/images/pages/MyOrders/producto4.jpg',
-  },
-];
+import '../Wishlist/Wishlist.css';
 
 function MyOrders() {
-  const navigate = useNavigate();
-
   return (
-    <div className="mo-page">
+    <main className="wishlist-page">
+      <PageBackButton />
 
-      {/* Perfil */}
-      <div className="mo-perfil">
-
-        <div className="mo-avatar">M</div>
-
-        <h2 className="mo-nombre-usuario">Mateo</h2>
-
-        <span className="mo-editar">
-          Edit profile ↗
-        </span>
-
-        <div className="mo-botones">
-
-          {/* Wishlist */}
-          <button className="mo-btn mo-btn-inactivo">
-            Wishlist ♡
-          </button>
-
-          {/* Botón activo */}
-          <button className="mo-btn mo-btn-activo">
-            My Orders
-          </button>
-
-          {/* Navega a My Products */}
-          <button
-            className="mo-btn mo-btn-inactivo"
-            onClick={() => navigate('/my-products')}
-          >
-            My purchases
-          </button>
-
+      <section className="wishlist-header">
+        <div className="wishlist-title" role="presentation">
+          My Orders
+          <img
+            src="/assets/images/pages/Profile/Truck.png"
+            alt=""
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Lista */}
-      <div className="mo-lista">
-
-        {pedidos.map((p) => (
-
-          <div key={p.id} className="mo-tarjeta">
-
-            <p className="mo-fecha">
-              {p.fecha}
-            </p>
+      <section className="wishlist-grid">
+        {myOrders.map((p) => (
+          <article key={p.id} className="mo-tarjeta">
+            <p className="mo-fecha">{p.purchaseDate}</p>
 
             <div className="mo-tarjeta-fila">
-
               <img
-                src={p.imagen}
-                alt={p.nombre}
+                src={p.line.image}
+                alt={p.line.name}
                 className="mo-imagen"
               />
 
               <div className="mo-info">
-
                 <p className="mo-estado">
-                  {p.estado}{' '}
+                  {p.status}{' '}
                   <span className="mo-check">✓</span>
                 </p>
-
-                <p className="mo-llegada">
-                  {p.llegada}
-                </p>
-
-                <p className="mo-nombre-prod">
-                  {p.nombre}
-                </p>
-
+                <p className="mo-llegada">{p.deliverySummary}</p>
+                <p className="mo-nombre-prod">{p.line.name}</p>
               </div>
 
               <div className="mo-acciones">
-
-                <button className="mo-btn-accion mo-btn-ver">
+                <Link to={`/my-orders/${p.id}`} className="mo-btn-accion mo-btn-ver">
                   View purchase
-                </button>
-
-                <button className="mo-btn-accion mo-btn-recomprar">
+                </Link>
+                <Link to={`/products/${p.line.productId}`} className="mo-btn-accion mo-btn-recomprar">
                   Repurchase
-                </button>
-
+                </Link>
               </div>
-
             </div>
-
-          </div>
-
+          </article>
         ))}
-
-      </div>
-
-    </div>
+      </section>
+    </main>
   );
 }
 
