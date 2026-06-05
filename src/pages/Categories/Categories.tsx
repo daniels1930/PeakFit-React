@@ -1,8 +1,8 @@
-import { type MouseEvent, useEffect, useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useRequireLogin } from "../../hooks/useRequireLogin";
-import { getCategoryProducts, type CatalogProduct } from "../../data/productCatalog";
+import { categoryProducts } from "../../data/categoryProducts";
 import "./Categories.css";
 
 type CategorySlug = "accessories" | "equipment";
@@ -27,7 +27,7 @@ const categoryInfo = {
   heroImage: string;
 }>;
 
-function CategoryCard({ product }: { product: CatalogProduct }) {
+function CategoryCard({ product }: { product: typeof categoryProducts[0] }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const requireLogin = useRequireLogin();
   const [imgIndex, setImgIndex] = useState(0);
@@ -111,42 +111,6 @@ function CategoryCard({ product }: { product: CatalogProduct }) {
 
 function Categories() {
   const { categorySlug } = useParams();
-  const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const selectedCategory =
-    categorySlug === "accessories" || categorySlug === "equipment" ? categorySlug : null;
-
-  useEffect(() => {
-    let active = true;
-
-    if (!selectedCategory) {
-      setProducts([]);
-      setLoading(false);
-      setError("");
-      return;
-    }
-
-    setLoading(true);
-    getCategoryProducts(selectedCategory)
-      .then((items) => {
-        if (!active) return;
-        setProducts(items);
-        setError("");
-      })
-      .catch(() => {
-        if (!active) return;
-        setProducts([]);
-        setError("Products are not available right now.");
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [selectedCategory]);
 
   if (!categorySlug) {
     return (
@@ -187,6 +151,7 @@ function Categories() {
   }
 
   const info = categoryInfo[categorySlug];
+  const products = categoryProducts.filter((product) => product.category === categorySlug);
 
   return (
     <main className="cat-page">
@@ -207,25 +172,11 @@ function Categories() {
         </div>
 
         <div className="cat-grid-wrap">
-          {loading ? (
-            <div className="cat-grid">
-              <div className="cat-card-info">
-                <p>Loading products...</p>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="cat-grid">
-              <div className="cat-card-info">
-                <p>{error}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="cat-grid">
-              {products.map((product) => (
-                <CategoryCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+          <div className="cat-grid">
+            {products.map((product) => (
+              <CategoryCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
       </section>
     </main>

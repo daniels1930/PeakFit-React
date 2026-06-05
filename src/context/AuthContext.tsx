@@ -12,136 +12,153 @@ import { supabase } from "../lib/supabase";
 export type AuthUser = {
   name: string;
   email: string;
-  photo?: string;
+  photo?: string | null;
 };
-
 
 type AuthContextType = {
   user: AuthUser | null;
   isAuthReady: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateUser: (data: AuthUser) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+async function loadProfile(userId: string, fallbackEmail = ""): Promise<AuthUser> {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, email, photo_url")
+    .eq("id", userId)
+    .single();
+
+  return {
+    name: profile?.full_name ?? "",
+    email: profile?.email ?? fallbackEmail,
+    photo: profile?.photo_url ?? null,
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
 
-useEffect(() => {
-  const loadUser = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+  useEffect(() => {
+    let mounted = true;
 
-    if (!session?.user) {
-      setUser(null);
-      setIsAuthReady(true);
-      return;
-    }
+    const loadUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single();
+      if (!session?.user) {
+        if (mounted) {
+          setUser(null);
+          setIsAuthReady(true);
+        }
+        return;
+      }
 
-    setUser({
-      name: profile?.full_name ?? "",
-      email: profile?.email ?? session.user.email ?? "",
-      photo: profile?.photo_url ?? undefined,
+      const profile = await loadProfile(session.user.id, session.user.email ?? "");
+      if (mounted) {
+        setUser(profile);
+        setIsAuthReady(true);
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
     });
 
-    setIsAuthReady(true);
-  };
+    if (error || !data.user) return false;
 
-  loadUser();
-}, []);
+    const profile = await loadProfile(data.user.id, data.user.email ?? "");
+    setUser(profile);
+    return true;
+  }, []);
 
-const login = useCallback(async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: email.trim().toLowerCase(),
-    password,
-  });
+  const register = useCallback(async (name: string, email: string, password: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!name.trim() || !normalizedEmail || !password) {
+      return { ok: false, error: "Name, email and password are required." };
+    }
 
-  if (error || !data.user) {
-    return false;
-  }
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedEmail,
+      password,
+    });
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", data.user.id)
-    .single();
+    if (error || !data.user) {
+      return {
+        ok: false,
+        error: error?.message ?? "Could not create account.",
+      };
+    }
 
-  setUser({
-    name: profile?.full_name ?? "",
-    email: profile?.email ?? data.user.email ?? "",
-    photo: profile?.photo_url ?? undefined,
-  });
-
-  return true;
-}, []);
-
-const register = useCallback(async (name: string, email: string, password: string) => {
-  const normalizedEmail = email.trim().toLowerCase();
-
-  if (!name.trim() || !normalizedEmail || !password) {
-    return false;
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email: normalizedEmail,
-    password,
-  });
-
-  if (error || !data.user) {
-  console.log("SIGNUP ERROR:", error);
-  return false;
-}
-
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .insert({
+    const { error: profileError } = await supabase.from("profiles").insert({
       id: data.user.id,
       full_name: name.trim(),
       email: normalizedEmail,
+      photo_url: null,
+      phone: null,
+      address: null,
+      city: null,
+      country: null,
+      postal_code: null,
     });
 
-  if (profileError) {
-  console.log("PROFILE ERROR:", profileError);
-  return false;
-}
+    if (profileError) {
+      console.log("PROFILE ERROR:", profileError);
+      return {
+        ok: false,
+        error: profileError.message ?? "Could not create profile.",
+      };
+    }
 
-  return true;
-}, []);
+    return { ok: true };
+  }, []);
 
-const logout = useCallback(async () => {
-  await supabase.auth.signOut();
-  setUser(null);
-}, []);
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  }, []);
 
- const updateUser = useCallback(async (data: AuthUser) => {
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
+  const updateUser = useCallback(async (data: AuthUser) => {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
 
-  if (!authUser) return;
+    if (!authUser) return;
 
-  await supabase
-    .from("profiles")
-    .update({
-      full_name: data.name,
+    await supabase
+      .from("profiles")
+      .update({
+        full_name: data.name,
+        email: data.email,
+        photo_url: data.photo ?? null,
+      })
+      .eq("id", authUser.id);
+
+    setUser({
+      name: data.name,
       email: data.email,
-      photo_url: data.photo ?? null,
-    })
-    .eq("id", authUser.id);
-
-  setUser(data);
-}, []);
+      photo: data.photo ?? null,
+    });
+  }, []);
 
   const value = useMemo(
     () => ({ user, isAuthReady, login, register, logout, updateUser }),

@@ -7,7 +7,7 @@ import "./OrderDetail.css";
 type OrderItem = {
   id: string;
   product_id: string;
-  name: string;
+  product_title: string;
   quantity: number;
   unit_price: number;
 };
@@ -17,7 +17,13 @@ type Order = {
   created_at: string;
   status: string;
   total: number;
-  shipping_address: string;
+  shipping_first_name: string;
+  shipping_last_name: string;
+  shipping_address1: string;
+  shipping_address2: string | null;
+  shipping_city: string;
+  shipping_country: string;
+  shipping_postal_code: string;
 };
 
 function OrderDetail() {
@@ -39,13 +45,13 @@ function OrderDetail() {
         navigate("/my-orders", { replace: true });
         return;
       }
-      setOrder(orderData);
+      setOrder(orderData as Order);
 
       const { data: itemsData } = await supabase
         .from("order_items")
         .select("*")
         .eq("order_id", orderId);
-      if (itemsData) setItems(itemsData);
+      if (itemsData) setItems(itemsData as OrderItem[]);
       setLoading(false);
     }
     fetchOrder();
@@ -75,7 +81,7 @@ function OrderDetail() {
             <h2>Order summary</h2>
             {items.map((item) => (
               <div key={item.id}>
-                <p>{item.name}</p>
+                <p>{item.product_title}</p>
                 <p>Quantity: {item.quantity}</p>
                 <p>Price: ${(item.unit_price * item.quantity).toFixed(2)}</p>
               </div>
@@ -101,8 +107,21 @@ function OrderDetail() {
           <h2>Shipping</h2>
           <dl>
             <div>
+              <dt>Name</dt>
+              <dd>
+                {order.shipping_first_name} {order.shipping_last_name}
+              </dd>
+            </div>
+            <div>
               <dt>Address</dt>
-              <dd>{order.shipping_address}</dd>
+              <dd>
+                {order.shipping_address1}
+                {order.shipping_address2 ? `, ${order.shipping_address2}` : ""}
+                <br />
+                {order.shipping_postal_code} - {order.shipping_city}
+                <br />
+                {order.shipping_country}
+              </dd>
             </div>
           </dl>
         </article>

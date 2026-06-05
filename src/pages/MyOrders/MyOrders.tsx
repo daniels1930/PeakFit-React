@@ -1,16 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import PageBackButton from '../../components/PageBackButton/PageBackButton';
-import { supabase } from '../../lib/supabase';
-import './MyOrders.css';
-import '../Wishlist/Wishlist.css';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import PageBackButton from "../../components/PageBackButton/PageBackButton";
+import { supabase } from "../../lib/supabase";
+import "./MyOrders.css";
+import "../Wishlist/Wishlist.css";
 
 type Order = {
   id: string;
   created_at: string;
   status: string;
   total: number;
-  shipping_address: string;
+  shipping_first_name: string;
+  shipping_last_name: string;
+  shipping_address1: string;
+  shipping_address2: string | null;
+  shipping_city: string;
+  shipping_country: string;
+  shipping_postal_code: string;
 };
 
 function MyOrders() {
@@ -26,11 +32,11 @@ function MyOrders() {
         return;
       }
       const { data } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      if (data) setOrders(data);
+        .from("orders")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+      if (data) setOrders(data as Order[]);
       setLoading(false);
     }
     fetchOrders();
@@ -53,15 +59,17 @@ function MyOrders() {
         {orders.length === 0 && <p>You have no orders yet.</p>}
         {orders.map((order) => (
           <article key={order.id} className="mo-tarjeta">
-            <p className="mo-fecha">
-              {new Date(order.created_at).toLocaleDateString()}
-            </p>
+            <p className="mo-fecha">{new Date(order.created_at).toLocaleDateString()}</p>
             <div className="mo-tarjeta-fila">
               <div className="mo-info">
                 <p className="mo-estado">
                   {order.status} <span className="mo-check">✓</span>
                 </p>
-                <p className="mo-llegada">{order.shipping_address}</p>
+                <p className="mo-llegada">
+                  {order.shipping_address1}
+                  {order.shipping_address2 ? `, ${order.shipping_address2}` : ""}
+                  , {order.shipping_city}, {order.shipping_country} {order.shipping_postal_code}
+                </p>
                 <p className="mo-nombre-prod">Total: ${order.total.toFixed(2)}</p>
               </div>
               <div className="mo-acciones">

@@ -22,39 +22,77 @@ type WishlistContextType = {
   isInWishlist: (id: string) => boolean;
 };
 
-const WISHLIST_KEY = "peakfit_wishlist";
-
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
-function readWishlist(): WishlistProduct[] {
-  try {
-    const raw = localStorage.getItem(WISHLIST_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as WishlistProduct[];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item) => item?.id && item?.name && item?.image && item?.price);
-  } catch {
-    return [];
-  }
+async function loadWishlistItems(userId: string): Promise<WishlistProduct[]> {
+  const { data, error } = await supabase
+    .from("wishlist_items")
+    .select(
+      `
+        product_id,
+        products (
+          id,
+          title,
+          price,
+          product_images (
+            image_url,
+            sort_order
+          )
+        )
+      `
+    )
+    .eq("user_id", userId);
+
+  if (error || !data) return [];
+
+  return (data as Array<{
+    product_id: string;
+    products?: {
+      id?: string;
+      title?: string;
+      price?: number | string;
+      product_images?: Array<{ image_url: string; sort_order: number }>;
+    } | null;
+  }>).flatMap((row) => {
+    const product = Array.isArray(row.products) ? row.products[0] : row.products;
+    if (!product) return [];
+
+    const images = Array.isArray(product.product_images) ? product.product_images : [];
+    const firstImage =
+      images
+        .sort((a: { image_url: string; sort_order: number }, b: { image_url: string; sort_order: number }) => a.sort_order - b.sort_order)[0]
+        ?.image_url ?? "";
+
+    return [
+      {
+        id: product.id ?? row.product_id,
+        name: product.title ?? "",
+        image: firstImage,
+        price:
+          typeof product.price === "number"
+            ? `$${Number(product.price).toFixed(2)}`
+            : String(product.price ?? ""),
+      },
+    ];
+  });
 }
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WishlistProduct[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [items, setItems] = useState<WishlistProduct[]>(() => readWishlist());
 
   useEffect(() => {
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
-  }, [items]);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }: { data: { session: { user?: { id?: string } } | null } }) => {
       setUserId(data.session?.user?.id ?? null);
     });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event: string, session: { user?: { id?: string } } | null) => {
       setUserId(session?.user?.id ?? null);
     });
-    return () => listener.subscription.unsubscribe();
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -62,22 +100,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
       setItems([]);
       return;
     }
-    supabase
-      .from("wishlist_items")
-      .select("*")
-      .eq("user_id", userId)
-      .then(({ data }) => {
-        if (data) {
-          setItems(
-            data.map((row) => ({
-              id: row.product_id,
-              name: row.name,
-              image: row.image,
-              price: row.price,
-            }))
-          );
-        }
-      });
+
+    loadWishlistItems(userId).then(setItems);
   }, [userId]);
 
   const toggleWishlist = useCallback(
@@ -94,13 +118,11 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
           }
           return prev.filter((p) => p.id !== producto.id);
         }
+
         if (userId) {
           supabase.from("wishlist_items").insert({
             user_id: userId,
             product_id: producto.id,
-            name: producto.name,
-            image: producto.image,
-            price: producto.price,
           });
         }
         return [...prev, producto];
@@ -109,19 +131,14 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     [userId]
   );
 
-  const isInWishlist = useCallback(
-    (id: string) => items.some((p) => p.id === id),
-    [items]
-  );
+  const isInWishlist = useCallback((id: string) => items.some((p) => p.id === id), [items]);
 
   const value = useMemo(
     () => ({ items, toggleWishlist, isInWishlist }),
     [items, toggleWishlist, isInWishlist]
   );
 
-  return (
-    <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>
-  );
+  return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
 }
 
 export function useWishlist() {

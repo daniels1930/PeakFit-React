@@ -34,73 +34,105 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | null>(null);
 
+async function loadCartLines(userId: string): Promise<CartLine[]> {
+  const { data, error } = await supabase
+    .from("cart_items")
+    .select(
+      `
+        product_id,
+        quantity,
+        unit_price,
+        products (
+          id,
+          title,
+          price,
+          product_images (
+            image_url,
+            sort_order
+          )
+        )
+      `
+    )
+    .eq("user_id", userId);
+
+  if (error || !data) return [];
+
+  return (data as Array<{
+    product_id: string;
+    quantity: number;
+    unit_price: number;
+    products?: {
+      id?: string;
+      title?: string;
+      price?: number | string;
+      product_images?: Array<{ image_url: string; sort_order: number }>;
+    } | null;
+  }>).flatMap((row) => {
+    const product = Array.isArray(row.products) ? row.products[0] : row.products;
+    if (!product) return [];
+    const images = Array.isArray(product.product_images) ? product.product_images : [];
+    const firstImage =
+      images
+        .sort((a: { image_url: string; sort_order: number }, b: { image_url: string; sort_order: number }) => a.sort_order - b.sort_order)[0]
+        ?.image_url ?? "";
+    const unitPrice = Number(row.unit_price ?? product.price ?? 0);
+    return [
+      {
+        id: product.id ?? row.product_id,
+        name: product.title ?? "",
+        image: firstImage,
+        priceLabel: `$${unitPrice.toFixed(2)}`,
+        unitPrice,
+        quantity: row.quantity ?? 1,
+      },
+    ];
+  });
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Escuchar si hay usuario logueado
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(({ data }: { data: { session: { user?: { id?: string } } | null } }) => {
       setUserId(data.session?.user?.id ?? null);
     });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event: string, session: { user?: { id?: string } } | null) => {
       setUserId(session?.user?.id ?? null);
     });
-    return () => listener.subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Cargar carrito desde Supabase cuando hay usuario
   useEffect(() => {
     if (!userId) {
       setLines([]);
       return;
     }
-    supabase
-      .from("cart_items")
-      .select("*")
-      .eq("user_id", userId)
-      .then(({ data }) => {
-        if (data) {
-          setLines(
-            data.map((row) => ({
-              id: row.product_id,
-              name: row.name,
-              image: row.image,
-              priceLabel: row.price_label,
-              unitPrice: row.unit_price,
-              quantity: row.quantity,
-            }))
-          );
-        }
-      });
+    loadCartLines(userId).then(setLines);
   }, [userId]);
 
-  // Guardar una línea en Supabase
   const upsertLine = useCallback(
     async (line: CartLine) => {
       if (!userId) return;
-      await supabase.from("cart_items").upsert({
-        user_id: userId,
-        product_id: line.id,
-        name: line.name,
-        image: line.image,
-        price_label: line.priceLabel,
-        unit_price: line.unitPrice,
-        quantity: line.quantity,
-      }, { onConflict: "user_id,product_id" });
+      await supabase.from("cart_items").upsert(
+        {
+          user_id: userId,
+          product_id: line.id,
+          quantity: line.quantity,
+          unit_price: line.unitPrice,
+        },
+        { onConflict: "user_id,product_id" }
+      );
     },
     [userId]
   );
 
-  // Borrar una línea en Supabase
   const deleteLine = useCallback(
     async (productId: string) => {
       if (!userId) return;
-      await supabase
-        .from("cart_items")
-        .delete()
-        .eq("user_id", userId)
-        .eq("product_id", productId);
+      await supabase.from("cart_items").delete().eq("user_id", userId).eq("product_id", productId);
     },
     [userId]
   );
@@ -111,26 +143,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const qty = Math.max(1, Math.floor(quantity));
       setLines((prev) => {
         const existing = prev.find((line) => line.id === product.id);
-        let next: CartLine[];
-        if (existing) {
-          next = prev.map((line) =>
-            line.id === product.id
-              ? { ...line, quantity: line.quantity + qty }
-              : line
-          );
-        } else {
-          const newLine: CartLine = {
-            id: product.id,
-            name: product.name,
-            image: product.images[0],
-            priceLabel: product.price,
-            unitPrice,
-            quantity: qty,
-          };
-          next = [...prev, newLine];
-        }
-        const updated = next.find((l) => l.id === product.id)!;
-        upsertLine(updated);
+        const next = existing
+          ? prev.map((line) =>
+              line.id === product.id
+                ? { ...line, quantity: line.quantity + qty, priceLabel: product.price }
+                : line
+            )
+          : [
+              ...prev,
+              {
+                id: product.id,
+                name: product.name,
+                image: product.images[0],
+                priceLabel: product.price,
+                unitPrice,
+                quantity: qty,
+              },
+            ];
+        const updated = next.find((l) => l.id === product.id);
+        if (updated) void upsertLine(updated);
         return next;
       });
     },
@@ -142,14 +173,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const q = Math.max(0, Math.floor(quantity));
       setLines((prev) => {
         if (q === 0) {
-          deleteLine(productId);
+          void deleteLine(productId);
           return prev.filter((line) => line.id !== productId);
         }
-        const next = prev.map((line) =>
-          line.id === productId ? { ...line, quantity: q } : line
-        );
+        const next = prev.map((line) => (line.id === productId ? { ...line, quantity: q } : line));
         const updated = next.find((l) => l.id === productId);
-        if (updated) upsertLine(updated);
+        if (updated) void upsertLine(updated);
         return next;
       });
     },
@@ -163,7 +192,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           line.id === productId ? { ...line, quantity: line.quantity + 1 } : line
         );
         const updated = next.find((l) => l.id === productId);
-        if (updated) upsertLine(updated);
+        if (updated) void upsertLine(updated);
         return next;
       });
     },
@@ -179,8 +208,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           )
           .filter((line) => line.quantity > 0);
         const updated = next.find((l) => l.id === productId);
-        if (updated) upsertLine(updated);
-        else deleteLine(productId);
+        if (updated) void upsertLine(updated);
+        else void deleteLine(productId);
         return next;
       });
     },
@@ -189,7 +218,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const removeLine = useCallback(
     (productId: string) => {
-      deleteLine(productId);
+      void deleteLine(productId);
       setLines((prev) => prev.filter((line) => line.id !== productId));
     },
     [deleteLine]
@@ -197,20 +226,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => {
     if (userId) {
-      supabase.from("cart_items").delete().eq("user_id", userId);
+      void supabase.from("cart_items").delete().eq("user_id", userId);
     }
     setLines([]);
   }, [userId]);
 
-  const itemCount = useMemo(
-    () => lines.reduce((sum, line) => sum + line.quantity, 0),
-    [lines]
-  );
-
-  const subtotal = useMemo(
-    () => lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0),
-    [lines]
-  );
+  const itemCount = useMemo(() => lines.reduce((sum, line) => sum + line.quantity, 0), [lines]);
+  const subtotal = useMemo(() => lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0), [lines]);
 
   const value = useMemo(
     () => ({

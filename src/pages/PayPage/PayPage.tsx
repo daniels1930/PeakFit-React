@@ -132,13 +132,39 @@ function PayPage() {
     const userId = sessionData.session?.user?.id;
 
     if (userId) {
+      const { data: productRows } = await supabase
+        .from("products")
+        .select("id, seller_id, title, product_images(image_url, sort_order)")
+        .in(
+          "id",
+          summary.items.map((item) => item.id)
+        );
+      const typedProductRows = (productRows ?? []) as Array<{
+        id: string;
+        seller_id: string;
+        title: string;
+        product_images?: Array<{ image_url: string; sort_order: number }>;
+      }>;
+
       const { data: order } = await supabase
         .from("orders")
         .insert({
           user_id: userId,
+          subtotal: paidTotal,
+          shipping_cost: 0,
+          tax: 0,
           total: paidTotal,
           status: "paid",
-          shipping_address: `${shipping.address1}, ${shipping.city}, ${shipping.country}`,
+          shipping_first_name: shipping.firstName,
+          shipping_last_name: shipping.lastName,
+          shipping_email: shipping.email,
+          shipping_phone: shipping.phone,
+          shipping_address1: shipping.address1,
+          shipping_address2: shipping.address2 || null,
+          shipping_city: shipping.city,
+          shipping_country: shipping.country,
+          shipping_postal_code: shipping.postalCode,
+          payment_method: "manual",
         })
         .select()
         .single();
@@ -147,7 +173,11 @@ function PayPage() {
         const orderItems = summary.items.map((item) => ({
           order_id: order.id,
           product_id: item.id,
-          name: item.name,
+          seller_id: typedProductRows.find((product) => product.id === item.id)?.seller_id ?? userId,
+          product_title: item.name,
+          product_image: typedProductRows
+            .find((product) => product.id === item.id)
+            ?.product_images?.sort((a, b) => a.sort_order - b.sort_order)[0]?.image_url ?? null,
           quantity: item.qty,
           unit_price: item.lineTotal / item.qty,
         }));

@@ -21,7 +21,7 @@ function Login() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
-   const ok = await login(email, password);
+    const ok = await login(email, password);
     if (ok) {
       const from = locationState?.from;
       const target =
@@ -52,9 +52,7 @@ function Login() {
         <div className="login-card">
           <h2>Welcome Back!</h2>
 
-          <p className="login-subtitle">
-            sign in to your account
-          </p>
+          <p className="login-subtitle">sign in to your account</p>
 
           {guestNotice ? (
             <p className="login-guest-notice" role="status">
@@ -87,15 +85,17 @@ function Login() {
               required
             />
 
-            {error ? <p className="login-form-error" role="alert">{error}</p> : null}
+            {error ? (
+              <p className="login-form-error" role="alert">
+                {error}
+              </p>
+            ) : null}
 
             <a href="#" className="forgot-password" onClick={(e) => e.preventDefault()}>
               Forgot password?
             </a>
 
-            <button type="submit">
-              LOG IN
-            </button>
+            <button type="submit">LOG IN</button>
           </form>
 
           <div className="login-divider">
@@ -104,37 +104,24 @@ function Login() {
 
           <div className="social-login">
             <button type="button">
-              <img
-                src="/assets/images/pages/Login/Google.png"
-                alt="Google"
-              />
+              <img src="/assets/images/pages/Login/Google.png" alt="Google" />
             </button>
 
             <button type="button">
-              <img
-                src="/assets/images/pages/Login/Facebook.png"
-                alt="Facebook"
-              />
+              <img src="/assets/images/pages/Login/Facebook.png" alt="Facebook" />
             </button>
 
             <button type="button">
-              <img
-                src="/assets/images/pages/Login/Apple.png"
-                alt="Apple"
-              />
+              <img src="/assets/images/pages/Login/Apple.png" alt="Apple" />
             </button>
 
             <button type="button">
-              <img
-                src="/assets/images/pages/Login/Microsoft.png"
-                alt="Microsoft"
-              />
+              <img src="/assets/images/pages/Login/Microsoft.png" alt="Microsoft" />
             </button>
           </div>
 
           <p className="signup-link">
-            Don&apos;t have an account?{" "}
-            <Link to="/signup">Sign up</Link>
+            Don&apos;t have an account? <Link to="/signup">Sign up</Link>
           </p>
         </div>
       </section>

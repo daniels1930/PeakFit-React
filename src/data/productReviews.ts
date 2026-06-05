@@ -1,6 +1,7 @@
 export type ProductReview = {
   id: string;
   author: string;
+  userId?: string;
   date: string;
   rating: number;
   title: string;

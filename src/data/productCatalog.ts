@@ -1,4 +1,6 @@
 import { supabase } from "../lib/supabase";
+import { products as fallbackProducts } from "./products";
+import { categoryProducts } from "./categoryProducts";
 
 export type CatalogCategory = "women" | "men" | "accessories" | "equipment";
 export type CatalogCollection = "Home" | "Women" | "Men" | "Accessories" | "Equipment";
@@ -23,6 +25,48 @@ const catalogApiUrl = import.meta.env.VITE_CATALOG_API_URL as string | undefined
 
 const defaultImage = "/assets/images/footer/logo.png";
 const cachedCatalogProducts: CatalogProduct[] = [];
+
+const fallbackCatalogProducts: CatalogProduct[] = fallbackProducts.map((product) => ({
+  id: product.id,
+  name: product.name,
+  price: product.price,
+  category: product.category,
+  collection: product.category === "women" ? "Women" : product.category === "men" ? "Men" : product.category === "accessories" ? "Accessories" : "Equipment",
+  productType: product.category === "women" || product.category === "men" ? "clothing" : product.category,
+  description: product.description,
+  images: [product.imagePrimary, product.imageSecondary, product.imageSecondary],
+  highlights: normalizeHighlights({} as RawCatalogProduct, product.category),
+  isNew: false,
+}));
+
+const fallbackCategoryProducts: CatalogProduct[] = categoryProducts.map((product) => ({
+  id: product.id,
+  name: product.name,
+  price: product.price,
+  category: product.category,
+  collection: product.category === "accessories" ? "Accessories" : "Equipment",
+  productType: product.category === "accessories" ? "accessories" : "equipment",
+  description:
+    product.category === "accessories"
+      ? "Essential accessories designed to support your PeakFit routine."
+      : "Training equipment built for strength, recovery, and performance.",
+  images: product.images,
+  highlights:
+    product.category === "accessories"
+      ? [
+          "Compact and easy to use",
+          "Built to support everyday training",
+          "A reliable PeakFit essential",
+          "Designed for comfort and movement",
+        ]
+      : [
+          "Built for focused strength and conditioning work",
+          "Designed for home and gym training routines",
+          "Durable feel for repeated sessions",
+          "Simple tool to support progressive workouts",
+        ],
+  isNew: product.isNew,
+}));
 
 export const catalogProducts = cachedCatalogProducts;
 export const relatedCatalogProducts = cachedCatalogProducts;
@@ -118,7 +162,16 @@ function normalizeProductType(raw: RawCatalogProduct, category: CatalogCategory)
 }
 
 function normalizeImages(raw: RawCatalogProduct): [string, string, string] {
+  let dbImages: string[] = [];
+  if (Array.isArray(raw.product_images)) {
+    dbImages = (raw.product_images as Array<{ image_url: unknown; sort_order?: unknown }>)
+      .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+      .map((img) => (typeof img.image_url === "string" ? img.image_url : ""))
+      .filter(Boolean);
+  }
+
   const imageList = [
+    ...dbImages,
     ...toArray(raw.images),
     ...toArray(raw.image_urls),
     ...toArray(raw.imageUrls),
@@ -195,13 +248,18 @@ async function fetchCatalogRows(): Promise<RawCatalogProduct[]> {
     return rows.filter((row): row is RawCatalogProduct => Boolean(row) && typeof row === "object");
   }
 
-  const { data, error } = await supabase.from("products").select("*");
+  const { data, error } = await supabase.from("products").select("*, product_images (image_url, sort_order)");
   if (error) throw error;
   return (data ?? []) as RawCatalogProduct[];
 }
 
 export async function fetchCatalogProducts() {
   const rows = await fetchCatalogRows();
+  if (rows.length === 0) {
+    const fallback = [...fallbackCatalogProducts, ...fallbackCategoryProducts];
+    updateCatalogCache(fallback);
+    return fallback;
+  }
   const products = rows
     .map((row) => normalizeCatalogProduct(row as RawCatalogProduct))
     .filter((product): product is CatalogProduct => product !== null);
@@ -225,7 +283,9 @@ export async function getCollectionProducts(collection: CatalogCollection) {
 
 export async function getCategoryProducts(category: "accessories" | "equipment") {
   const products = await fetchCatalogProducts();
-  return products.filter((product) => product.category === category || product.productType === category);
+  const filtered = products.filter((product) => product.category === category || product.productType === category);
+  if (filtered.length > 0) return filtered;
+  return fallbackCategoryProducts.filter((product) => product.category === category);
 }
 
 export async function getRelatedCatalogProducts(product?: CatalogProduct | null) {

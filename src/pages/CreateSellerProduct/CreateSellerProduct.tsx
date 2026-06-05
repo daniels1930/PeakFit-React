@@ -29,7 +29,7 @@ function CreateSellerProduct() {
   // Si no hay id, el formulario queda vacío (modo creación)
   useEffect(() => {
     if (id) {
-      const producto = productos.find((p) => p.id === Number(id));
+      const producto = productos.find((p) => p.id === id);
       if (producto) {
         setTitulo(producto.nombre);
         setPrecio(producto.precio.toString());
@@ -48,7 +48,7 @@ function CreateSellerProduct() {
     reader.readAsDataURL(archivo);
   }
 
-  function guardar() {
+  async function guardar() {
     // Validaciones básicas antes de guardar
     if (!titulo.trim()) {
       alert('Enter a title for the product');
@@ -62,14 +62,14 @@ function CreateSellerProduct() {
     // Si hay id → editar producto existente
     // Si no hay id → crear producto nuevo
     if (id) {
-      editarProducto(
-        Number(id),
+      await editarProducto(
+        id,
         titulo,
         parseFloat(precio) || 0,
         imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
       );
     } else {
-      agregarProducto(
+      await agregarProducto(
         titulo,
         parseFloat(precio) || 0,
         imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
