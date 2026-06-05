@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext";
 import { useRequireLogin } from "../../hooks/useRequireLogin";
-import { womenProducts } from "../../data/womenProducts";
+import { getCollectionProducts, type CatalogProduct } from "../../data/productCatalog";
 import "./WomenCollection.css";
 
 const heroSlides = [
@@ -19,7 +19,7 @@ const emptyMessages: Record<Exclude<FilterTab, "all">, string> = {
   supplements: "No supplements available for women yet.",
 };
 
-function ProductCard({ product }: { product: typeof womenProducts[0] }) {
+function ProductCard({ product }: { product: CatalogProduct }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const requireLogin = useRequireLogin();
   const [imgIndex, setImgIndex] = useState(0);
@@ -95,12 +95,38 @@ function ProductCard({ product }: { product: typeof womenProducts[0] }) {
 function WomenCollection() {
   const [heroSlide, setHeroSlide] = useState(0);
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const productsRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    getCollectionProducts("Women")
+      .then((items) => {
+        if (!active) return;
+        setProducts(items);
+        setError("");
+      })
+      .catch(() => {
+        if (!active) return;
+        setProducts([]);
+        setError("Women's products are not available right now.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filtered =
     activeTab === "all"
-      ? womenProducts
-      : womenProducts.filter((p) => p.category === activeTab);
+      ? products
+      : products.filter((p) => p.productType === activeTab);
   const emptyMessage =
     activeTab === "all" ? "No products available for women yet." : emptyMessages[activeTab];
 
@@ -162,7 +188,15 @@ function WomenCollection() {
           </div>
         </div>
         <div className="wc-grid-wrap">
-          {filtered.length > 0 ? (
+          {loading ? (
+            <div className="wc-empty-state">
+              <h3>Loading products...</h3>
+            </div>
+          ) : error ? (
+            <div className="wc-empty-state">
+              <h3>{error}</h3>
+            </div>
+          ) : filtered.length > 0 ? (
             <div className="wc-grid">
               {filtered.map((product) => (
                 <ProductCard key={product.id} product={product} />

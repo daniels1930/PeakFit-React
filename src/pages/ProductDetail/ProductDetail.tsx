@@ -1,37 +1,63 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import PageBackButton from "../../components/PageBackButton/PageBackButton";
+import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 import { catalogProductToWishlist, useWishlist } from "../../context/WishlistContext";
 import { useRequireLogin } from "../../hooks/useRequireLogin";
-import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
+import { supabase } from "../../lib/supabase";
+import {
+  fetchCatalogProducts,
+  getCatalogProduct,
+  getRelatedCatalogProducts,
+  type CatalogProduct,
+} from "../../data/productCatalog";
 import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
 
-const REVIEWS_KEY_PREFIX = "peakfit_product_reviews";
+type ReviewRow = {
+  id: string;
+  rating: number;
+  title: string;
+  body: string;
+  created_at: string;
+  user_id: string;
+  profiles?: { full_name?: string } | null;
+};
 
-function getReviewsKey(productId: string) {
-  return `${REVIEWS_KEY_PREFIX}_${productId}`;
-}
+async function loadProductReviews(productId: string): Promise<ProductReview[]> {
+  const { data, error } = await supabase
+    .from("reviews")
+    .select(
+      `
+        id,
+        rating,
+        title,
+        body,
+        created_at,
+        user_id,
+        profiles (
+          full_name
+        )
+      `
+    )
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
 
-function readProductReviews(productId: string): ProductReview[] {
-  try {
-    const raw = localStorage.getItem(getReviewsKey(productId));
-    if (!raw) return getInitialReviews(productId);
-    const parsed = JSON.parse(raw) as ProductReview[];
-    if (!Array.isArray(parsed)) return getInitialReviews(productId);
-    return parsed.filter(
-      (review) =>
-        typeof review?.id === "string" &&
-        typeof review.author === "string" &&
-        typeof review.date === "string" &&
-        typeof review.rating === "number" &&
-        typeof review.title === "string" &&
-        typeof review.body === "string"
-    );
-  } catch {
-    return getInitialReviews(productId);
-  }
+  if (error || !data) return getInitialReviews(productId);
+
+  const rows = data as ReviewRow[];
+  if (rows.length === 0) return getInitialReviews(productId);
+
+  return rows.map((row) => ({
+    id: row.id,
+    author: row.profiles?.full_name ?? "Verified buyer",
+    userId: row.user_id,
+    date: new Date(row.created_at).toLocaleDateString(),
+    rating: row.rating,
+    title: row.title,
+    body: row.body,
+  }));
 }
 
 function Stars({ rating }: { rating: number }) {
@@ -46,7 +72,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
+function ProductTile({ product }: { product: CatalogProduct }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const requireLogin = useRequireLogin();
   const liked = isInWishlist(product.id);
@@ -92,10 +118,15 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
 function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const product = catalogProducts.find((item) => item.id === productId);
+  const { user } = useAuth();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addFromCatalog } = useCart();
   const requireLogin = useRequireLogin();
+  const [product, setProduct] = useState<CatalogProduct | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<CatalogProduct[]>([]);
+  const [viewedProducts, setViewedProducts] = useState<CatalogProduct[]>([]);
+  const [loadingProduct, setLoadingProduct] = useState(true);
+  const [productError, setProductError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [question, setQuestion] = useState("");
   const [questionSent, setQuestionSent] = useState(false);
@@ -103,10 +134,60 @@ function ProductDetail() {
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewBody, setReviewBody] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
-  const [reviews, setReviews] = useState<ProductReview[]>(() =>
-    product ? readProductReviews(product.id) : []
-  );
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!productId) {
+      setProduct(null);
+      setLoadingProduct(false);
+      return;
+    }
+
+    setLoadingProduct(true);
+    setProductError("");
+
+    getCatalogProduct(productId)
+      .then(async (foundProduct) => {
+        if (!active) return;
+        setProduct(foundProduct);
+
+        if (!foundProduct) {
+          setRelatedProducts([]);
+          setViewedProducts([]);
+          return;
+        }
+
+        const [related, allProducts] = await Promise.all([
+          getRelatedCatalogProducts(foundProduct),
+          fetchCatalogProducts(),
+        ]);
+
+        if (!active) return;
+        setRelatedProducts(related);
+        setViewedProducts(
+          allProducts
+            .filter((item) => item.id !== foundProduct.id && item.category === foundProduct.category)
+            .slice(0, 8)
+        );
+      })
+      .catch(() => {
+        if (!active) return;
+        setProduct(null);
+        setRelatedProducts([]);
+        setViewedProducts([]);
+        setProductError("This product is not available right now.");
+      })
+      .finally(() => {
+        if (active) setLoadingProduct(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [productId]);
 
   useEffect(() => {
     if (!product) {
@@ -117,20 +198,27 @@ function ProductDetail() {
     setSelectedImage(0);
     setQuestion("");
     setQuestionSent(false);
-    setReviews(readProductReviews(product.id));
     setShowAddedToCart(false);
+
+    let active = true;
+    loadProductReviews(product.id).then((nextReviews) => {
+      if (active) setReviews(nextReviews);
+    });
+
+    return () => {
+      active = false;
+    };
   }, [product]);
+
+  useEffect(() => {
+    setReviewName(user?.name ?? "");
+  }, [user?.name]);
 
   useEffect(() => {
     if (!showAddedToCart) return;
     const timerId = window.setTimeout(() => setShowAddedToCart(false), 2800);
     return () => window.clearTimeout(timerId);
   }, [showAddedToCart]);
-
-  const relatedProducts = relatedCatalogProducts.filter((item) => item.id !== product?.id).slice(0, 8);
-  const viewedProducts = catalogProducts
-    .filter((item) => item.id !== product?.id && item.category === product?.category)
-    .slice(0, 8);
 
   const averageRating = useMemo(() => {
     if (reviews.length === 0) {
@@ -140,12 +228,21 @@ function ProductDetail() {
     return reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
   }, [reviews]);
 
+  if (loadingProduct) {
+    return (
+      <main className="product-detail-page page-workspace">
+        <p className="page-kicker">PeakFit product</p>
+        <h1>Loading product...</h1>
+      </main>
+    );
+  }
+
   if (!product) {
     return (
       <main className="product-detail-page page-workspace">
         <p className="page-kicker">PeakFit product</p>
         <h1>Product not found</h1>
-        <p>This product is not available in the catalog.</p>
+        <p>{productError || "This product is not available in the catalog."}</p>
         <Link className="page-action" to="/home">
           Back to shop
         </Link>
@@ -158,39 +255,64 @@ function ProductDetail() {
   const submitQuestion = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!requireLogin("Sign in to ask questions about a product.")) return;
     if (!question.trim()) {
       return;
     }
 
-    setQuestion("");
-    setQuestionSent(true);
+    (async () => {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (!authUser || !product) return;
+
+      const { error } = await supabase.from("product_questions").insert({
+        product_id: product.id,
+        user_id: authUser.id,
+        question: question.trim(),
+      });
+
+      if (!error) {
+        setQuestion("");
+        setQuestionSent(true);
+      }
+    })();
   };
 
   const submitReview = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!requireLogin("Sign in to leave a product review.")) return;
     if (!reviewName.trim() || !reviewTitle.trim() || !reviewBody.trim()) {
       return;
     }
 
-    const newReview: ProductReview = {
-      id: `${product.id}-user-review-${Date.now()}`,
-      author: reviewName.trim(),
-      date: "Just now",
-      rating: reviewRating,
-      title: reviewTitle.trim(),
-      body: reviewBody.trim(),
-    };
+    (async () => {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
 
-    setReviews((currentReviews) => {
-      const nextReviews = [newReview, ...currentReviews];
-      localStorage.setItem(getReviewsKey(product.id), JSON.stringify(nextReviews));
-      return nextReviews;
-    });
-    setReviewName("");
-    setReviewTitle("");
-    setReviewBody("");
-    setReviewRating(5);
+      if (!authUser || !product) return;
+
+      const { error } = await supabase.from("reviews").insert({
+        product_id: product.id,
+        user_id: authUser.id,
+        rating: reviewRating,
+        title: reviewTitle.trim(),
+        body: reviewBody.trim(),
+        status: "published",
+      });
+
+      if (!error) {
+        const nextReviews = await loadProductReviews(product.id);
+        setReviews(nextReviews);
+        setReviewName(user?.name ?? "");
+        setReviewTitle("");
+        setReviewBody("");
+        setReviewRating(5);
+      }
+    })();
   };
 
   return (

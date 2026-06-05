@@ -9,7 +9,7 @@ export type CategoryProduct = {
 
 export const categoryProducts: CategoryProduct[] = [
   {
-    id: "ac-1",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000001",
     name: "PeakFit Training Cap",
     price: "$24.00 USD",
     isNew: true,
@@ -21,7 +21,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-2",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000002",
     name: "Performance Gym Bag",
     price: "$58.00 USD",
     isNew: true,
@@ -33,7 +33,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-3",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000003",
     name: "Grip Training Gloves",
     price: "$32.00 USD",
     isNew: true,
@@ -45,7 +45,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-4",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000004",
     name: "Core Crew Socks",
     price: "$18.00 USD",
     isNew: false,
@@ -57,7 +57,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-5",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000005",
     name: "Hydration Bottle",
     price: "$22.00 USD",
     isNew: true,
@@ -69,7 +69,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-6",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000006",
     name: "Wrist Support Wraps",
     price: "$20.00 USD",
     isNew: false,
@@ -81,7 +81,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-7",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000007",
     name: "Training Towel",
     price: "$16.00 USD",
     isNew: false,
@@ -93,7 +93,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "ac-8",
+    id: "a3b4c5d6-e7f8-4001-8001-000000000008",
     name: "Running Waist Pack",
     price: "$28.00 USD",
     isNew: true,
@@ -105,7 +105,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-1",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000001",
     name: "Adjustable Dumbbell Set",
     price: "$120.00 USD",
     isNew: true,
@@ -117,7 +117,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-2",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000002",
     name: "Resistance Band Kit",
     price: "$36.00 USD",
     isNew: true,
@@ -129,7 +129,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-3",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000003",
     name: "Premium Yoga Mat",
     price: "$44.00 USD",
     isNew: false,
@@ -141,7 +141,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-4",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000004",
     name: "Speed Jump Rope",
     price: "$26.00 USD",
     isNew: true,
@@ -153,7 +153,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-5",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000005",
     name: "Core Stability Ball",
     price: "$34.00 USD",
     isNew: false,
@@ -165,7 +165,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-6",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000006",
     name: "Foam Recovery Roller",
     price: "$30.00 USD",
     isNew: true,
@@ -177,7 +177,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-7",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000007",
     name: "Kettlebell Trainer",
     price: "$48.00 USD",
     isNew: false,
@@ -189,7 +189,7 @@ export const categoryProducts: CategoryProduct[] = [
     ],
   },
   {
-    id: "eq-8",
+    id: "e3d4c5b6-a7f8-4002-8002-000000000008",
     name: "Push-Up Bar Pair",
     price: "$24.00 USD",
     isNew: false,

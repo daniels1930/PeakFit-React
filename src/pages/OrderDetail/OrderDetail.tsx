@@ -1,15 +1,64 @@
-import { Link, Navigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import PageBackButton from "../../components/PageBackButton/PageBackButton";
-import { myOrders } from "../../data/myOrders";
+import { supabase } from "../../lib/supabase";
 import "./OrderDetail.css";
+
+type OrderItem = {
+  id: string;
+  product_id: string;
+  product_title: string;
+  quantity: number;
+  unit_price: number;
+};
+
+type Order = {
+  id: string;
+  created_at: string;
+  status: string;
+  total: number;
+  shipping_first_name: string;
+  shipping_last_name: string;
+  shipping_address1: string;
+  shipping_address2: string | null;
+  shipping_city: string;
+  shipping_country: string;
+  shipping_postal_code: string;
+};
 
 function OrderDetail() {
   const { orderId } = useParams();
-  const order = myOrders.find((item) => item.id === orderId);
+  const navigate = useNavigate();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!order) {
-    return <Navigate to="/my-orders" replace />;
-  }
+  useEffect(() => {
+    async function fetchOrder() {
+      if (!orderId) return;
+      const { data: orderData } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("id", orderId)
+        .single();
+      if (!orderData) {
+        navigate("/my-orders", { replace: true });
+        return;
+      }
+      setOrder(orderData as Order);
+
+      const { data: itemsData } = await supabase
+        .from("order_items")
+        .select("*")
+        .eq("order_id", orderId);
+      if (itemsData) setItems(itemsData as OrderItem[]);
+      setLoading(false);
+    }
+    fetchOrder();
+  }, [orderId, navigate]);
+
+  if (loading) return <main className="order-detail-page"><p>Loading...</p></main>;
+  if (!order) return null;
 
   return (
     <main className="order-detail-page">
@@ -18,21 +67,25 @@ function OrderDetail() {
       <section className="order-detail-header">
         <div>
           <p>Purchase details</p>
-          <h1>Order {order.id.toUpperCase()}</h1>
+          <h1>Order {order.id.toUpperCase().slice(0, 8)}</h1>
         </div>
         <span>{order.status}</span>
       </section>
 
       <section className="order-detail-layout">
         <article className="order-detail-product">
-          <img src={order.line.image} alt={order.line.name} />
           <div>
-            <p className="order-detail-date">{order.purchaseDate}</p>
-            <h2>{order.line.name}</h2>
-            <p>Delivered on {order.arrivalDate}</p>
-            <p>Quantity: {order.line.quantity}</p>
-            <strong>{order.line.price}</strong>
-            <Link to={`/products/${order.line.productId}`}>Repurchase</Link>
+            <p className="order-detail-date">
+              {new Date(order.created_at).toLocaleDateString()}
+            </p>
+            <h2>Order summary</h2>
+            {items.map((item) => (
+              <div key={item.id}>
+                <p>{item.product_title}</p>
+                <p>Quantity: {item.quantity}</p>
+                <p>Price: ${(item.unit_price * item.quantity).toFixed(2)}</p>
+              </div>
+            ))}
           </div>
         </article>
 
@@ -40,30 +93,12 @@ function OrderDetail() {
           <h2>Payment</h2>
           <dl>
             <div>
-              <dt>Payment method</dt>
-              <dd>
-                {order.payment.method} ending in {order.payment.lastFour}
-              </dd>
-            </div>
-            <div>
-              <dt>Transaction</dt>
-              <dd>{order.payment.transactionId}</dd>
-            </div>
-            <div>
-              <dt>Subtotal</dt>
-              <dd>{order.payment.subtotal}</dd>
-            </div>
-            <div>
-              <dt>Shipping</dt>
-              <dd>{order.payment.shipping}</dd>
-            </div>
-            <div>
-              <dt>Tax</dt>
-              <dd>{order.payment.tax}</dd>
+              <dt>Status</dt>
+              <dd>{order.status}</dd>
             </div>
             <div className="order-detail-total">
               <dt>Total paid</dt>
-              <dd>{order.payment.total}</dd>
+              <dd>${order.total.toFixed(2)}</dd>
             </div>
           </dl>
         </article>
@@ -72,20 +107,21 @@ function OrderDetail() {
           <h2>Shipping</h2>
           <dl>
             <div>
-              <dt>Recipient</dt>
-              <dd>{order.shipping.recipient}</dd>
+              <dt>Name</dt>
+              <dd>
+                {order.shipping_first_name} {order.shipping_last_name}
+              </dd>
             </div>
             <div>
               <dt>Address</dt>
-              <dd>{order.shipping.address}</dd>
-            </div>
-            <div>
-              <dt>Carrier</dt>
-              <dd>{order.shipping.carrier}</dd>
-            </div>
-            <div>
-              <dt>Tracking</dt>
-              <dd>{order.shipping.trackingNumber}</dd>
+              <dd>
+                {order.shipping_address1}
+                {order.shipping_address2 ? `, ${order.shipping_address2}` : ""}
+                <br />
+                {order.shipping_postal_code} - {order.shipping_city}
+                <br />
+                {order.shipping_country}
+              </dd>
             </div>
           </dl>
         </article>

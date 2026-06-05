@@ -1,40 +1,73 @@
-// Aquí se crea y se editan los productos
-// Si la URL tiene un id como por ejemplo create-seller-product/123, carga los datos del producto
-// Si no tiene id como create-seller-product, es un producto nuevo
-
+// useNavigate: para cambiar de página
+// useParams: para leer el id de la URL
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductos } from '../../context/ProductContext';
 import PageBackButton from '../../components/PageBackButton/PageBackButton';
+import { supabase } from '../../lib/supabase';
 import './CreateSellerProduct.css';
+
+type CategoryOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+const fallbackCategories: CategoryOption[] = [
+  { id: "women", name: "Women", slug: "women" },
+  { id: "men", name: "Men", slug: "men" },
+  { id: "accessories", name: "Accessories", slug: "accessories" },
+  { id: "equipment", name: "Equipment", slug: "equipment" },
+];
 
 function CreateSellerProduct() {
   const navigate = useNavigate();
 
-  // useParams lee el id de la URL si existe
+  // Lee el id de la URL. Ej: si la URL es /create-seller-product/123, id = "123"
+  // Si la URL es /create-seller-product, id = undefined
   const { id } = useParams<{ id: string }>();
 
+  // Trae las funciones y datos del contexto global de productos
   const { productos, agregarProducto, editarProducto } = useProductos();
 
+  // Cada useState guarda un dato del formulario mientras el usuario escribe
   const [titulo, setTitulo] = useState('');
   const [condicion, setCondicion] = useState<'new' | 'used'>('new');
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
   const [tag, setTag] = useState('');
   const [imagen, setImagen] = useState<string | null>(null);
+  const [categorySlug, setCategorySlug] = useState('');
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
 
-  // Si hay un id en la URL, busca el producto y carga sus datos en el formulario
+  // useEffect se ejecuta cuando el componente carga o cuando cambia el id
+  // Si hay un id, busca ese producto y rellena el formulario con sus datos (modo edición)
+  // Si no hay id, el formulario queda vacío (modo creación)
   useEffect(() => {
     if (id) {
-      const producto = productos.find((p) => p.id === Number(id));
+      const producto = productos.find((p) => p.id === id);
       if (producto) {
         setTitulo(producto.nombre);
         setPrecio(producto.precio.toString());
         setImagen(producto.imagen);
+        setCategorySlug(producto.categoryName.toLowerCase());
       }
     }
   }, [id, productos]);
 
+  useEffect(() => {
+    supabase
+      .from('categories')
+      .select('id, name, slug')
+      .order('name', { ascending: true })
+      .then(({ data, error }) => {
+        const dbCategories = (error || !data ? [] : (data as CategoryOption[]));
+        const merged = dbCategories.length > 0 ? dbCategories : fallbackCategories;
+        setCategories(merged);
+      });
+  }, []);
+
+  // Cuando el usuario sube una imagen, crea una URL temporal para previsualizarla
   function manejarImagen(e: React.ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0];
     if (!archivo) return;
@@ -44,7 +77,8 @@ function CreateSellerProduct() {
     reader.readAsDataURL(archivo);
   }
 
-  function guardar() {
+  async function guardar() {
+    // Validaciones básicas antes de guardar
     if (!titulo.trim()) {
       alert('Enter a title for the product');
       return;
@@ -53,50 +87,59 @@ function CreateSellerProduct() {
       alert('Enter a price');
       return;
     }
+    if (!categorySlug.trim()) {
+      alert('Select a category');
+      return;
+    }
 
+    const selectedCategory = categories.find((category) => category.slug === categorySlug);
+    if (!selectedCategory || selectedCategory.id === selectedCategory.slug) {
+      alert('The category table needs real database rows before saving. Please seed categories in Supabase.');
+      return;
+    }
+
+    // Si hay id → editar producto existente
+    // Si no hay id → crear producto nuevo
     if (id) {
-      // Si hay id entonces estamos editando un producto existente
-      editarProducto(
-        Number(id),
+      await editarProducto(
+        id,
         titulo,
         parseFloat(precio) || 0,
-        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
+        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg',
+        selectedCategory.id
       );
     } else {
-      // Si no hay id entonces estamos creando un producto nuevo
-      agregarProducto(
+      await agregarProducto(
         titulo,
         parseFloat(precio) || 0,
-        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
+        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg',
+        selectedCategory.id
       );
     }
 
-    // Regresa a SellerProduct con los cambios ya aplicados
+    // Después de guardar, regresa a la página de productos
     navigate('/seller-product');
   }
 
   return (
     <div className="csp-page">
-
       <PageBackButton onClick={() => navigate('/seller-product')} />
 
       <div className="csp-contenido">
 
-        {/* Zona de imagen */}
+        {/* Si ya hay imagen la muestra, si no muestra el botón para subir una */}
         <div className="csp-imagen-zona">
           {imagen ? (
             <img src={imagen} alt="Product preview" className="csp-preview" />
           ) : (
             <label className="csp-upload-label" htmlFor="inputImagen">
-
-              {/* imagen flecha */}
               <img
                 src="/assets/images/pages/CreateSellerProduct/Flecha.png"
                 alt="Upload image"
-                 className="csp-icono"
+                className="csp-icono"
               />
-
               <span>Upload Image</span>
+              {/* input oculto, se activa al hacer clic en el label */}
               <input
                 id="inputImagen"
                 type="file"
@@ -108,12 +151,12 @@ function CreateSellerProduct() {
           )}
         </div>
 
-        {/* Formulario */}
         <div className="csp-form">
-          {/* Título cambia según si es crear o editar */}
+          {/* El título cambia según si estamos editando o creando */}
           <h1 className="csp-titulo">{id ? 'EDIT PRODUCT' : 'NEW PRODUCT'}</h1>
 
           <label className="csp-label">Title</label>
+          {/* Cada input está conectado a su useState: value lo muestra, onChange lo actualiza */}
           <input
             className="csp-input"
             type="text"
@@ -123,6 +166,7 @@ function CreateSellerProduct() {
           />
 
           <label className="csp-label">State</label>
+          {/* Botones que cambian el estado condicion entre 'new' y 'used' */}
           <div className="csp-estado-botones">
             <button
               className={`csp-estado-btn ${condicion === 'new' ? 'csp-activo' : ''}`}
@@ -164,14 +208,33 @@ function CreateSellerProduct() {
             onChange={(e) => setTag(e.target.value)}
           />
 
+          <label className="csp-label">Category</label>
+          <select
+            className="csp-input"
+            value={categorySlug}
+            onChange={(e) => setCategorySlug(e.target.value)}
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+
           <button className="csp-btn-guardar" onClick={guardar}>
             Save changes
           </button>
         </div>
       </div>
-
     </div>
   );
 }
 
 export default CreateSellerProduct;
+
+
+// useParams — lee variables de la URL. Si la URL tiene /123, te da id = "123".
+// useState — cada campo del formulario tiene su propio estado. Cuando el usuario escribe, onChange actualiza el estado y React re-renderiza.
+// useEffect — detecta si hay un id en la URL. Si hay, rellena el formulario con los datos existentes (edición). Si no hay, el formulario queda vacío (creación).
+// id ? editar : crear — un ternario que decide si llamar editarProducto o agregarProducto según si venimos de editar o crear.

@@ -4,35 +4,47 @@ import { useAuth } from "../../context/AuthContext";
 import PageBackButton from "../../components/PageBackButton/PageBackButton";
 import "./EditProfile.css";
 
-const DEFAULT_PHOTO = "/assets/images/pages/EditProfile/Mateo.png";
-
 function EditProfile() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
-  const [photo, setPhoto] = useState(user?.photo ?? DEFAULT_PHOTO);
+  const [photo, setPhoto] = useState(user?.photo ?? "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setPhoto(reader.result as string);
+    reader.onload = async () => {
+      const nextPhoto = reader.result as string;
+      setPhoto(nextPhoto);
+      await updateUser({ name, email, photo: nextPhoto });
+    };
     reader.readAsDataURL(file);
   }
 
+  async function clearPhoto() {
+    setPhoto("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    await updateUser({ name, email, photo: null });
+  }
+
   function handleSave() {
-    updateUser({ name, email, photo });
+    updateUser({ name, email, photo: photo || null });
   }
 
   function handleDiscard() {
     setName(user?.name ?? "");
     setEmail(user?.email ?? "");
-    setPhoto(user?.photo ?? DEFAULT_PHOTO);
+    setPhoto(user?.photo ?? "");
   }
+
+  const initial = name.trim().charAt(0).toUpperCase() || "U";
 
   return (
     <main className="edit-profile-page">
@@ -41,13 +53,14 @@ function EditProfile() {
       <section className="edit-profile-layout">
         <article className="edit-profile-card edit-profile-card-left">
           <div className="edit-profile-avatar-wrap">
-            <img
-              src={photo}
-              alt="Profile photo"
-              className="edit-profile-avatar"
-            />
+            {photo ? (
+              <img src={photo} alt="Profile photo" className="edit-profile-avatar" />
+            ) : (
+              <div className="edit-profile-avatar edit-profile-avatar--placeholder" aria-hidden="true">
+                {initial}
+              </div>
+            )}
 
-            {/* Input file oculto */}
             <input
               ref={fileInputRef}
               type="file"
@@ -63,6 +76,16 @@ function EditProfile() {
               onClick={() => fileInputRef.current?.click()}
             >
               ✎
+            </button>
+
+            <button
+              type="button"
+              className="edit-profile-avatar-clear"
+              aria-label="Remove photo"
+              onClick={clearPhoto}
+              disabled={!photo}
+            >
+              ×
             </button>
           </div>
 
@@ -80,37 +103,29 @@ function EditProfile() {
             <div className="edit-profile-row">
               <div className="edit-profile-field">
                 <label>Name (s)</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
               <div className="edit-profile-field">
                 <label>Last name</label>
-                <input type="text" defaultValue="Rojas" />
+                <input type="text" placeholder="Last name" />
               </div>
             </div>
 
             <div className="edit-profile-field">
-              <label>Email adress</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <label>Email address</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
 
             <div className="edit-profile-row">
               <div className="edit-profile-field">
-                <label>Adress</label>
-                <input type="text" defaultValue="Calle 12 # 5 - 20" />
+                <label>Address</label>
+                <input type="text" placeholder="Address" />
               </div>
 
               <div className="edit-profile-field">
                 <label>Phone number</label>
-                <input type="text" defaultValue="313 625 8920" />
+                <input type="text" placeholder="Phone number" />
               </div>
             </div>
 

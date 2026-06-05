@@ -1,6 +1,11 @@
-import { catalogProducts, type CatalogProduct } from "./productCatalog";
+import {
+  catalogProducts,
+  fetchCatalogProducts,
+  type CatalogCategory,
+  type CatalogProduct,
+} from "./productCatalog";
 
-const searchKeywords: Record<CatalogProduct["category"], string[]> = {
+const searchKeywords: Record<CatalogCategory, string[]> = {
   accessories: ["accessory", "accesorios", "gear", "cap", "bag", "gloves", "bottle", "towel"],
   equipment: ["equipos", "training tools", "dumbbell", "weights", "mat", "rope", "kettlebell", "bar"],
   men: ["hombre", "male", "shorts", "shirt"],
@@ -11,7 +16,7 @@ export function normalizeSearch(value: string) {
   return value.trim().toLowerCase();
 }
 
-export function searchCatalogProducts(query: string) {
+function rankProducts(products: CatalogProduct[], query: string) {
   const normalizedQuery = normalizeSearch(query);
 
   if (!normalizedQuery) {
@@ -20,7 +25,7 @@ export function searchCatalogProducts(query: string) {
 
   const terms = normalizedQuery.split(/\s+/).filter(Boolean);
 
-  return catalogProducts
+  return products
     .map((product) => {
       const keywordText = searchKeywords[product.category].join(" ");
       const searchableText = normalizeSearch(
@@ -29,6 +34,7 @@ export function searchCatalogProducts(query: string) {
           product.price,
           product.category,
           product.collection,
+          product.productType,
           product.description,
           product.highlights.join(" "),
           keywordText,
@@ -48,4 +54,13 @@ export function searchCatalogProducts(query: string) {
     .filter((result) => result.score > 0)
     .sort((a, b) => b.score - a.score)
     .map((result) => result.product);
+}
+
+export function searchCatalogProducts(query: string) {
+  return rankProducts(catalogProducts, query);
+}
+
+export async function searchCatalogProductsAsync(query: string) {
+  const products = await fetchCatalogProducts();
+  return rankProducts(products, query);
 }

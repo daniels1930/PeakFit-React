@@ -11,14 +11,14 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
-    const ok = register(name, email, password);
-    if (ok) {
+    const result = await register(name, email, password);
+    if (result.ok) {
       navigate("/login", { replace: true });
     } else {
-      setError("Could not create account. That email may already be in use.");
+      setError(result.error ?? "Could not create account.");
     }
   }
 
@@ -43,8 +43,8 @@ function SignUp() {
           <h2>Sign up</h2>
 
           <p className="signup-subtitle">
-            Create your account and unlock exclusive fitness gear,
-            personalized recommendations, and member only offers.
+            Create your account and unlock exclusive fitness gear, personalized recommendations,
+            and member only offers.
           </p>
 
           <form className="signup-form" onSubmit={handleSubmit}>
@@ -84,16 +84,17 @@ function SignUp() {
               required
             />
 
-            {error ? <p className="signup-form-error" role="alert">{error}</p> : null}
+            {error ? (
+              <p className="signup-form-error" role="alert">
+                {error}
+              </p>
+            ) : null}
 
-            <button type="submit">
-              CREATE ACCOUNT
-            </button>
+            <button type="submit">CREATE ACCOUNT</button>
           </form>
 
           <p className="login-link">
-            You already have an account?{" "}
-            <Link to="/login">Log in</Link>
+            You already have an account? <Link to="/login">Log in</Link>
           </p>
         </div>
       </section>

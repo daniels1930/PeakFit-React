@@ -7,63 +7,41 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { supabase } from "../lib/supabase";
 
 export type AuthUser = {
   name: string;
   email: string;
-  photo?: string;
+  photo?: string | null;
 };
-
-type StoredUser = AuthUser & { password: string };
-
-const SESSION_KEY = "peakfit_session";
-const USERS_KEY = "peakfit_registered_users";
-
-const DEMO_EMAIL = "mateo@email.com";
-const DEMO_PASSWORD = "1234";
-const DEMO_NAME = "Mateo Rojas";
 
 type AuthContextType = {
   user: AuthUser | null;
-  /** false until session is read from localStorage (avoid redirect flash on refresh). */
   isAuthReady: boolean;
-  login: (email: string, password: string) => boolean;
-  register: (name: string, email: string, password: string) => boolean;
-  logout: () => void;
-  updateUser: (data: AuthUser) => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<{ ok: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  updateUser: (data: AuthUser) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-function readSession(): AuthUser | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw) as AuthUser;
-    if (data?.email && data?.name) return data;
-    return null;
-  } catch {
-    return null;
-  }
-}
+async function loadProfile(userId: string, fallbackEmail = ""): Promise<AuthUser> {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, email, photo_url")
+    .eq("id", userId)
+    .single();
 
-function getRegisteredUsers(): StoredUser[] {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as StoredUser[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveSession(user: AuthUser) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
+  return {
+    name: profile?.full_name ?? "",
+    email: profile?.email ?? fallbackEmail,
+    photo: profile?.photo_url ?? null,
+  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -71,72 +49,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthReady, setIsAuthReady] = useState(false);
 
   useEffect(() => {
-    setUser(readSession());
-    setIsAuthReady(true);
-  }, []);
+    let mounted = true;
 
-  const login = useCallback((email: string, password: string) => {
-    const normalizedEmail = email.trim().toLowerCase();
+    const loadUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    if (normalizedEmail === DEMO_EMAIL && password === DEMO_PASSWORD) {
-      const sessionUser = { name: DEMO_NAME, email: normalizedEmail };
-      saveSession(sessionUser);
-      setUser(sessionUser);
-      return true;
-    }
+      if (!session?.user) {
+        if (mounted) {
+          setUser(null);
+          setIsAuthReady(true);
+        }
+        return;
+      }
 
-    const registered = getRegisteredUsers();
-    const match = registered.find(
-      (u) => u.email.toLowerCase() === normalizedEmail && u.password === password
-    );
-
-    if (match) {
-      const sessionUser = { name: match.name, email: match.email };
-      saveSession(sessionUser);
-      setUser(sessionUser);
-      return true;
-    }
-
-    return false;
-  }, []);
-
-  const register = useCallback((name: string, email: string, password: string) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!name.trim() || !normalizedEmail || !password) return false;
-
-    if (normalizedEmail === DEMO_EMAIL) return false;
-
-    const registered = getRegisteredUsers();
-    if (registered.some((u) => u.email.toLowerCase() === normalizedEmail)) {
-      return false;
-    }
-
-    const newUser: StoredUser = {
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
+      const profile = await loadProfile(session.user.id, session.user.email ?? "");
+      if (mounted) {
+        setUser(profile);
+        setIsAuthReady(true);
+      }
     };
-    registered.push(newUser);
-    localStorage.setItem(USERS_KEY, JSON.stringify(registered));
+
+    loadUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
+
+    if (error || !data.user) return false;
+
+    const profile = await loadProfile(data.user.id, data.user.email ?? "");
+    setUser(profile);
     return true;
   }, []);
 
-  const logout = useCallback(() => {
-    clearSession();
+  const register = useCallback(async (name: string, email: string, password: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!name.trim() || !normalizedEmail || !password) {
+      return { ok: false, error: "Name, email and password are required." };
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email: normalizedEmail,
+      password,
+    });
+
+    if (error || !data.user) {
+      return {
+        ok: false,
+        error: error?.message ?? "Could not create account.",
+      };
+    }
+
+    const { error: profileError } = await supabase.from("profiles").upsert({
+      id: data.user.id,
+      full_name: name.trim(),
+      email: normalizedEmail,
+      photo_url: null,
+      phone: null,
+      address: null,
+      city: null,
+      country: null,
+      postal_code: null,
+    });
+
+    if (profileError) {
+      console.error("PROFILE ERROR:", profileError);
+      return {
+        ok: false,
+        error: profileError.message ?? "Could not create profile.",
+      };
+    }
+
+    return { ok: true };
+  }, []);
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
     setUser(null);
   }, []);
 
-  const updateUser = useCallback((data: AuthUser) => {
-    saveSession(data);
-    const registered = getRegisteredUsers();
-    const updatedUsers = registered.map((storedUser) =>
-      storedUser.email.toLowerCase() === user?.email.toLowerCase()
-        ? { ...storedUser, name: data.name, email: data.email, photo: data.photo }
-        : storedUser
-    );
-    localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
-    setUser(data);
-  }, [user?.email]);
+  const updateUser = useCallback(async (data: AuthUser) => {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    if (!authUser) return;
+
+    await supabase
+      .from("profiles")
+      .update({
+        full_name: data.name,
+        email: data.email,
+        photo_url: data.photo ?? null,
+      })
+      .eq("id", authUser.id);
+
+    setUser({
+      name: data.name,
+      email: data.email,
+      photo: data.photo ?? null,
+    });
+  }, []);
 
   const value = useMemo(
     () => ({ user, isAuthReady, login, register, logout, updateUser }),

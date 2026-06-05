@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { formatUsd } from "../../utils/price";
+import { supabase } from "../../lib/supabase";
 import "./PayPage.css";
 
 type ShippingForm = {
@@ -39,9 +40,7 @@ function PayPage() {
   const { lines, subtotal, clearCart } = useCart();
   const [step, setStep] = useState<1 | 2>(1);
   const [shipping, setShipping] = useState<ShippingForm>(initialShipping);
-  const [shippingErrors, setShippingErrors] = useState<Errors<ShippingForm>>(
-    {},
-  );
+  const [shippingErrors, setShippingErrors] = useState<Errors<ShippingForm>>({});
 
   const [confirmed, setConfirmed] = useState(false);
   const [confirmError, setConfirmError] = useState<string>("");
@@ -120,7 +119,7 @@ function PayPage() {
     setStep(1);
   }
 
-  function handleConfirmPurchase() {
+  async function handleConfirmPurchase() {
     setConfirmError("");
     if (!confirmed) {
       setConfirmError("Please confirm to continue");
@@ -128,6 +127,120 @@ function PayPage() {
     }
 
     const paidTotal = summary.total;
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+
+    if (userId) {
+      const { data: productRows } = await supabase
+        .from("products")
+        .select("id, seller_id, title, product_images(image_url, sort_order)")
+        .in(
+          "id",
+          summary.items.map((item) => item.id)
+        );
+      const typedProductRows = (productRows ?? []) as Array<{
+        id: string;
+        seller_id: string;
+        title: string;
+        product_images?: Array<{ image_url: string; sort_order: number }>;
+      }>;
+
+      const { data: order } = await supabase
+        .from("orders")
+        .insert({
+          user_id: userId,
+          subtotal: paidTotal,
+          shipping_cost: 0,
+          tax: 0,
+          total: paidTotal,
+          status: "paid",
+          shipping_first_name: shipping.firstName,
+          shipping_last_name: shipping.lastName,
+          shipping_email: shipping.email,
+          shipping_phone: shipping.phone,
+          shipping_address1: shipping.address1,
+          shipping_address2: shipping.address2 || null,
+          shipping_city: shipping.city,
+          shipping_country: shipping.country,
+          shipping_postal_code: shipping.postalCode,
+          payment_method: "manual",
+        })
+        .select()
+        .single();
+
+      if (!order) {
+        setConfirmError("Could not create the order. Please check the console for Supabase errors.");
+        return;
+      }
+
+      if (order) {
+        const orderItems = summary.items.map((item) => ({
+          order_id: order.id,
+          product_id: item.id,
+          seller_id: typedProductRows.find((product) => product.id === item.id)?.seller_id ?? userId,
+          product_title: item.name,
+          product_image: typedProductRows
+            .find((product) => product.id === item.id)
+            ?.product_images?.sort((a, b) => a.sort_order - b.sort_order)[0]?.image_url ?? null,
+          quantity: item.qty,
+          unit_price: item.lineTotal / item.qty,
+        }));
+        const { error: orderItemsError } = await supabase.from("order_items").insert(orderItems);
+        if (orderItemsError) {
+          setConfirmError(orderItemsError.message);
+          return;
+        }
+
+        const { error: paymentError } = await supabase.from("payments").insert({
+          order_id: order.id,
+          provider: "manual",
+          status: "approved",
+          amount: paidTotal,
+          currency: "USD",
+        });
+
+        if (paymentError) {
+          setConfirmError(paymentError.message);
+          return;
+        }
+
+        const sellerIds = Array.from(
+          new Set(
+            typedProductRows
+              .map((product) => product.seller_id)
+              .filter((sellerId): sellerId is string => Boolean(sellerId))
+          )
+        );
+
+        const notifications = [
+          {
+            user_id: userId,
+            type: "order_confirmation",
+            title: "Order confirmed",
+            body: `Your order for ${formatUsd(paidTotal)} was created successfully.`,
+            related_order_id: order.id,
+          },
+          ...sellerIds.map((sellerId) => ({
+            user_id: sellerId,
+            type: "new_order",
+            title: "New order received",
+            body: `You received a new order for ${formatUsd(paidTotal)}.`,
+            related_order_id: order.id,
+          })),
+        ];
+
+        const { error: notificationsError } = await supabase
+          .from("notifications")
+          .insert(notifications);
+
+        if (notificationsError) {
+          setConfirmError(notificationsError.message);
+          return;
+        }
+      }
+    }
+
     setPaid(true);
     clearCart();
     navigate("/payment-success", {
@@ -316,18 +429,14 @@ function PayPage() {
                       <div key={it.id} className="summary__row">
                         <div>
                           <div className="summary__name">{it.name}</div>
-                          <div className="summary__meta">
-                            Qty: {it.qty}
-                          </div>
+                          <div className="summary__meta">Qty: {it.qty}</div>
                         </div>
                         <div className="summary__price">{formatUsd(it.lineTotal)}</div>
                       </div>
                     ))}
                     <div className="summary__row total">
                       <div className="summary__name">Total</div>
-                      <div className="summary__price">
-                        {formatUsd(summary.total)}
-                      </div>
+                      <div className="summary__price">{formatUsd(summary.total)}</div>
                     </div>
                   </div>
                 </div>
@@ -389,4 +498,5 @@ function PayPage() {
     </main>
   );
 }
+
 export default PayPage;
