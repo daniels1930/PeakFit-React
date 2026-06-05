@@ -41,9 +41,11 @@ function CreateSellerProduct() {
   // Cuando el usuario sube una imagen, crea una URL temporal para previsualizarla
   function manejarImagen(e: React.ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0];
-    if (archivo) {
-      setImagen(URL.createObjectURL(archivo));
-    }
+    if (!archivo) return;
+
+    const reader = new FileReader();
+    reader.onload = () => setImagen(reader.result as string);
+    reader.readAsDataURL(archivo);
   }
 
   function guardar() {
