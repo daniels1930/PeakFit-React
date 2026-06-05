@@ -11,6 +11,7 @@ export type CatalogProduct = {
   name: string;
   price: string;
   category: CatalogCategory;
+  categoryId?: string | null;
   collection: CatalogCollection;
   productType: CatalogProductType;
   description: string;
@@ -134,6 +135,18 @@ function normalizeCollection(raw: RawCatalogProduct): CatalogCollection {
 }
 
 function normalizeCategory(raw: RawCatalogProduct, collection: CatalogCollection): CatalogCategory {
+  const categoryName = pickString(raw, ["category_name", "categoryName", "categories.name"]).toLowerCase();
+  if (categoryName.includes("women") || categoryName.includes("mujer") || categoryName.includes("female")) return "women";
+  if (categoryName.includes("men") || categoryName.includes("hombre") || categoryName.includes("male")) return "men";
+  if (categoryName.includes("accessor")) return "accessories";
+  if (categoryName.includes("equipment") || categoryName.includes("gear")) return "equipment";
+
+  const categoryId = pickString(raw, ["category_id", "categoryId", "categories.id"]).toLowerCase();
+  if (categoryId === "women") return "women";
+  if (categoryId === "men") return "men";
+  if (categoryId === "accessories") return "accessories";
+  if (categoryId === "equipment") return "equipment";
+
   const value = pickString(raw, ["category", "gender", "collection", "section", "type", "product_type"]).toLowerCase();
 
   if (value.includes("accessor")) return "accessories";
@@ -226,6 +239,7 @@ function normalizeCatalogProduct(raw: RawCatalogProduct): CatalogProduct | null 
     name,
     price: normalizePrice(raw.price ?? raw.unit_price ?? raw.amount),
     category,
+    categoryId: pickString(raw, ["category_id", "categoryId", "categories.id"]) || null,
     collection,
     productType,
     description,
@@ -248,9 +262,16 @@ async function fetchCatalogRows(): Promise<RawCatalogProduct[]> {
     return rows.filter((row): row is RawCatalogProduct => Boolean(row) && typeof row === "object");
   }
 
-  const { data, error } = await supabase.from("products").select("*, product_images (image_url, sort_order)");
+  const { data, error } = await supabase.from("products").select("*, product_images (image_url, sort_order), categories (id, name, slug)");
   if (error) throw error;
-  return (data ?? []) as RawCatalogProduct[];
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => {
+    const category = Array.isArray(row.categories) ? row.categories[0] : row.categories;
+    return {
+      ...row,
+      category_id: row.category_id ?? category?.id ?? null,
+      category_name: row.category_name ?? category?.name ?? null,
+    };
+  }) as RawCatalogProduct[];
 }
 
 export async function fetchCatalogProducts() {

@@ -169,6 +169,11 @@ function PayPage() {
         .select()
         .single();
 
+      if (!order) {
+        setConfirmError("Could not create the order. Please check the console for Supabase errors.");
+        return;
+      }
+
       if (order) {
         const orderItems = summary.items.map((item) => ({
           order_id: order.id,
@@ -181,7 +186,58 @@ function PayPage() {
           quantity: item.qty,
           unit_price: item.lineTotal / item.qty,
         }));
-        await supabase.from("order_items").insert(orderItems);
+        const { error: orderItemsError } = await supabase.from("order_items").insert(orderItems);
+        if (orderItemsError) {
+          setConfirmError(orderItemsError.message);
+          return;
+        }
+
+        const { error: paymentError } = await supabase.from("payments").insert({
+          order_id: order.id,
+          provider: "manual",
+          status: "approved",
+          amount: paidTotal,
+          currency: "USD",
+        });
+
+        if (paymentError) {
+          setConfirmError(paymentError.message);
+          return;
+        }
+
+        const sellerIds = Array.from(
+          new Set(
+            typedProductRows
+              .map((product) => product.seller_id)
+              .filter((sellerId): sellerId is string => Boolean(sellerId))
+          )
+        );
+
+        const notifications = [
+          {
+            user_id: userId,
+            type: "order_confirmation",
+            title: "Order confirmed",
+            body: `Your order for ${formatUsd(paidTotal)} was created successfully.`,
+            related_order_id: order.id,
+          },
+          ...sellerIds.map((sellerId) => ({
+            user_id: sellerId,
+            type: "new_order",
+            title: "New order received",
+            body: `You received a new order for ${formatUsd(paidTotal)}.`,
+            related_order_id: order.id,
+          })),
+        ];
+
+        const { error: notificationsError } = await supabase
+          .from("notifications")
+          .insert(notifications);
+
+        if (notificationsError) {
+          setConfirmError(notificationsError.message);
+          return;
+        }
       }
     }
 

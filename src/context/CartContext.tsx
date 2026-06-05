@@ -10,6 +10,14 @@ import {
 import type { CatalogProduct } from "../data/productCatalog";
 import { parsePriceUsd } from "../utils/price";
 import { supabase } from "../lib/supabase";
+import { useAppDispatch } from "../store/hooks";
+import {
+  addCartItem,
+  clearCart as clearCartState,
+  removeCartItem,
+  setCartItems,
+  updateCartItemQuantity,
+} from "../features/cart/cartSlice";
 
 export type CartLine = {
   id: string;
@@ -92,6 +100,7 @@ async function loadCartLines(userId: string): Promise<CartLine[]> {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }: { data: { session: { user?: { id?: string } } | null } }) => {
@@ -108,23 +117,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) {
       setLines([]);
+      dispatch(clearCartState());
       return;
     }
-    loadCartLines(userId).then(setLines);
+    loadCartLines(userId).then((items) => {
+      setLines(items);
+      dispatch(
+        setCartItems(
+          items.map((item) => ({
+            productId: item.id,
+            name: item.name,
+            image: item.image,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+          }))
+        )
+      );
+    });
   }, [userId]);
 
   const upsertLine = useCallback(
     async (line: CartLine) => {
       if (!userId) return;
-      await supabase.from("cart_items").upsert(
-        {
-          user_id: userId,
-          product_id: line.id,
-          quantity: line.quantity,
-          unit_price: line.unitPrice,
-        },
-        { onConflict: "user_id,product_id" }
-      );
+      const payload = {
+        user_id: userId,
+        product_id: line.id,
+        quantity: line.quantity,
+        unit_price: line.unitPrice,
+      };
+
+      const { data: existing, error: fetchError } = await supabase
+        .from("cart_items")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("product_id", line.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error("Error checking cart item:", fetchError);
+        return;
+      }
+
+      if (existing?.id) {
+        const { error: updateError } = await supabase
+          .from("cart_items")
+          .update(payload)
+          .eq("id", existing.id);
+
+        if (updateError) {
+          console.error("Error updating cart item:", updateError);
+        }
+        return;
+      }
+
+      const { error: insertError } = await supabase.from("cart_items").insert(payload);
+      if (insertError) {
+        console.error("Error inserting cart item:", insertError);
+      }
     },
     [userId]
   );
@@ -162,10 +211,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
             ];
         const updated = next.find((l) => l.id === product.id);
         if (updated) void upsertLine(updated);
+        dispatch(
+          addCartItem({
+            productId: product.id,
+            name: product.name,
+            image: product.images[0],
+            unitPrice,
+            quantity: qty,
+          })
+        );
         return next;
       });
     },
-    [upsertLine]
+    [upsertLine, dispatch]
   );
 
   const updateQuantity = useCallback(
@@ -174,15 +232,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setLines((prev) => {
         if (q === 0) {
           void deleteLine(productId);
+          dispatch(removeCartItem(productId));
           return prev.filter((line) => line.id !== productId);
         }
         const next = prev.map((line) => (line.id === productId ? { ...line, quantity: q } : line));
         const updated = next.find((l) => l.id === productId);
         if (updated) void upsertLine(updated);
+        dispatch(updateCartItemQuantity({ productId, quantity: q }));
         return next;
       });
     },
-    [upsertLine, deleteLine]
+    [upsertLine, deleteLine, dispatch]
   );
 
   const increment = useCallback(
@@ -193,10 +253,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
         const updated = next.find((l) => l.id === productId);
         if (updated) void upsertLine(updated);
+        if (updated) {
+          dispatch(updateCartItemQuantity({ productId, quantity: updated.quantity }));
+        }
         return next;
       });
     },
-    [upsertLine]
+    [upsertLine, dispatch]
   );
 
   const decrement = useCallback(
@@ -210,18 +273,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const updated = next.find((l) => l.id === productId);
         if (updated) void upsertLine(updated);
         else void deleteLine(productId);
+        if (updated) {
+          dispatch(updateCartItemQuantity({ productId, quantity: updated.quantity }));
+        } else {
+          dispatch(removeCartItem(productId));
+        }
         return next;
       });
     },
-    [upsertLine, deleteLine]
+    [upsertLine, deleteLine, dispatch]
   );
 
   const removeLine = useCallback(
     (productId: string) => {
       void deleteLine(productId);
       setLines((prev) => prev.filter((line) => line.id !== productId));
+      dispatch(removeCartItem(productId));
     },
-    [deleteLine]
+    [deleteLine, dispatch]
   );
 
   const clearCart = useCallback(() => {
@@ -229,7 +298,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       void supabase.from("cart_items").delete().eq("user_id", userId);
     }
     setLines([]);
-  }, [userId]);
+    dispatch(clearCartState());
+  }, [userId, dispatch]);
 
   const itemCount = useMemo(() => lines.reduce((sum, line) => sum + line.quantity, 0), [lines]);
   const subtotal = useMemo(() => lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0), [lines]);

@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     }
 
-    const { error: profileError } = await supabase.from("profiles").insert({
+    const { error: profileError } = await supabase.from("profiles").upsert({
       id: data.user.id,
       full_name: name.trim(),
       email: normalizedEmail,
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (profileError) {
-      console.log("PROFILE ERROR:", profileError);
+      console.error("PROFILE ERROR:", profileError);
       return {
         ok: false,
         error: profileError.message ?? "Could not create profile.",

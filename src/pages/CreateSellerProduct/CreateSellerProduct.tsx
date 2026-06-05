@@ -4,7 +4,21 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useProductos } from '../../context/ProductContext';
 import PageBackButton from '../../components/PageBackButton/PageBackButton';
+import { supabase } from '../../lib/supabase';
 import './CreateSellerProduct.css';
+
+type CategoryOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+const fallbackCategories: CategoryOption[] = [
+  { id: "women", name: "Women", slug: "women" },
+  { id: "men", name: "Men", slug: "men" },
+  { id: "accessories", name: "Accessories", slug: "accessories" },
+  { id: "equipment", name: "Equipment", slug: "equipment" },
+];
 
 function CreateSellerProduct() {
   const navigate = useNavigate();
@@ -23,6 +37,8 @@ function CreateSellerProduct() {
   const [precio, setPrecio] = useState('');
   const [tag, setTag] = useState('');
   const [imagen, setImagen] = useState<string | null>(null);
+  const [categorySlug, setCategorySlug] = useState('');
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
 
   // useEffect se ejecuta cuando el componente carga o cuando cambia el id
   // Si hay un id, busca ese producto y rellena el formulario con sus datos (modo edición)
@@ -34,9 +50,22 @@ function CreateSellerProduct() {
         setTitulo(producto.nombre);
         setPrecio(producto.precio.toString());
         setImagen(producto.imagen);
+        setCategorySlug(producto.categoryName.toLowerCase());
       }
     }
   }, [id, productos]);
+
+  useEffect(() => {
+    supabase
+      .from('categories')
+      .select('id, name, slug')
+      .order('name', { ascending: true })
+      .then(({ data, error }) => {
+        const dbCategories = (error || !data ? [] : (data as CategoryOption[]));
+        const merged = dbCategories.length > 0 ? dbCategories : fallbackCategories;
+        setCategories(merged);
+      });
+  }, []);
 
   // Cuando el usuario sube una imagen, crea una URL temporal para previsualizarla
   function manejarImagen(e: React.ChangeEvent<HTMLInputElement>) {
@@ -58,6 +87,16 @@ function CreateSellerProduct() {
       alert('Enter a price');
       return;
     }
+    if (!categorySlug.trim()) {
+      alert('Select a category');
+      return;
+    }
+
+    const selectedCategory = categories.find((category) => category.slug === categorySlug);
+    if (!selectedCategory || selectedCategory.id === selectedCategory.slug) {
+      alert('The category table needs real database rows before saving. Please seed categories in Supabase.');
+      return;
+    }
 
     // Si hay id → editar producto existente
     // Si no hay id → crear producto nuevo
@@ -66,13 +105,15 @@ function CreateSellerProduct() {
         id,
         titulo,
         parseFloat(precio) || 0,
-        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
+        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg',
+        selectedCategory.id
       );
     } else {
       await agregarProducto(
         titulo,
         parseFloat(precio) || 0,
-        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg'
+        imagen ?? '/assets/images/pages/SellerProduct/producto1.jpg',
+        selectedCategory.id
       );
     }
 
@@ -166,6 +207,20 @@ function CreateSellerProduct() {
             value={tag}
             onChange={(e) => setTag(e.target.value)}
           />
+
+          <label className="csp-label">Category</label>
+          <select
+            className="csp-input"
+            value={categorySlug}
+            onChange={(e) => setCategorySlug(e.target.value)}
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.name}
+              </option>
+            ))}
+          </select>
 
           <button className="csp-btn-guardar" onClick={guardar}>
             Save changes

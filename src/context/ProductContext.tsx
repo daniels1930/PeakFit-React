@@ -8,12 +8,27 @@ export interface Producto {
   precio: number;
   estado: 'sold' | 'unsold';
   imagen: string;
+  categoryId: string | null;
+  categoryName: string;
 }
+
+const fallbackCategoryNames: Record<string, string> = {
+  women: 'Women',
+  men: 'Men',
+  accessories: 'Accessories',
+  equipment: 'Equipment',
+};
 
 interface ProductContextType {
   productos: Producto[];
-  agregarProducto: (nombre: string, precio: number, imagen: string) => Promise<void>;
-  editarProducto: (id: string, nombre: string, precio: number, imagen: string) => Promise<void>;
+  agregarProducto: (nombre: string, precio: number, imagen: string, categoryId: string) => Promise<void>;
+  editarProducto: (
+    id: string,
+    nombre: string,
+    precio: number,
+    imagen: string,
+    categoryId: string
+  ) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType | null>(null);
@@ -45,7 +60,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   const loadSellerProducts = async (uid: string) => {
     const { data, error } = await supabase
       .from('products')
-      .select('*, product_images (image_url)')
+      .select('*, product_images (image_url), categories (id, name, slug)')
       .eq('seller_id', uid)
       .order('created_at', { ascending: false });
 
@@ -66,6 +81,12 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         precio: Number(p.price),
         estado: p.status === 'sold' ? 'sold' : 'unsold',
         imagen: imageUrl,
+        categoryId: Array.isArray(p.categories)
+          ? p.categories[0]?.id ?? null
+          : p.categories?.id ?? p.category_id ?? null,
+        categoryName: Array.isArray(p.categories)
+          ? p.categories[0]?.name ?? fallbackCategoryNames[p.category_id as string] ?? 'Uncategorized'
+          : p.categories?.name ?? fallbackCategoryNames[p.category_id as string] ?? 'Uncategorized',
       };
     });
 
@@ -81,17 +102,18 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   }, [userId]);
 
   // Agrega un producto nuevo en Supabase
-  async function agregarProducto(nombre: string, precio: number, imagen: string) {
+  async function agregarProducto(nombre: string, precio: number, imagen: string, categoryId: string) {
     if (!userId) return;
 
     const { data: newProd, error: prodErr } = await supabase
       .from('products')
       .insert({
         seller_id: userId,
+        category_id: categoryId,
         title: nombre,
         description: 'Seller uploaded product',
         price: precio,
-        status: 'active',
+        status: 'draft',
         product_condition: 'new',
       })
       .select()
@@ -112,13 +134,14 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
     if (imgErr) {
       console.error('Error inserting product image:', imgErr);
+      return;
     }
 
     await loadSellerProducts(userId);
   }
 
   // Edita un producto que ya existe en Supabase
-  async function editarProducto(id: string, nombre: string, precio: number, imagen: string) {
+  async function editarProducto(id: string, nombre: string, precio: number, imagen: string, categoryId: string) {
     if (!userId) return;
 
     const { error: prodErr } = await supabase
@@ -126,6 +149,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       .update({
         title: nombre,
         price: precio,
+        category_id: categoryId,
       })
       .eq('id', id)
       .eq('seller_id', userId);

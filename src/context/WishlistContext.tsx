@@ -8,6 +8,13 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "../lib/supabase";
+import { useAppDispatch } from "../store/hooks";
+import {
+  addWishlistItem,
+  clearWishlist as clearWishlistState,
+  removeWishlistItem,
+  setWishlistItems,
+} from "../features/wishlist/wishlistSlice";
 
 export type WishlistProduct = {
   id: string;
@@ -80,6 +87,7 @@ async function loadWishlistItems(userId: string): Promise<WishlistProduct[]> {
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WishlistProduct[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }: { data: { session: { user?: { id?: string } } | null } }) => {
@@ -98,37 +106,71 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) {
       setItems([]);
+      dispatch(clearWishlistState());
       return;
     }
 
-    loadWishlistItems(userId).then(setItems);
+    loadWishlistItems(userId).then((loaded) => {
+      setItems(loaded);
+      dispatch(
+        setWishlistItems(
+          loaded.map((item) => ({
+            productId: item.id,
+            name: item.name,
+            image: item.image,
+            price: item.price,
+          }))
+        )
+      );
+    });
   }, [userId]);
 
   const toggleWishlist = useCallback(
-    (producto: WishlistProduct) => {
-      setItems((prev) => {
-        const exists = prev.some((p) => p.id === producto.id);
-        if (exists) {
-          if (userId) {
-            supabase
-              .from("wishlist_items")
-              .delete()
-              .eq("user_id", userId)
-              .eq("product_id", producto.id);
+    async (producto: WishlistProduct) => {
+      const exists = items.some((p) => p.id === producto.id);
+
+      if (exists) {
+        if (userId) {
+          const { error } = await supabase
+            .from("wishlist_items")
+            .delete()
+            .eq("user_id", userId)
+            .eq("product_id", producto.id);
+
+          if (error) {
+            console.error("Error removing wishlist item:", error);
+            return;
           }
-          return prev.filter((p) => p.id !== producto.id);
         }
 
-        if (userId) {
-          supabase.from("wishlist_items").insert({
-            user_id: userId,
-            product_id: producto.id,
-          });
+        setItems((prev) => prev.filter((p) => p.id !== producto.id));
+        dispatch(removeWishlistItem(producto.id));
+        return;
+      }
+
+      if (userId) {
+        const { error } = await supabase.from("wishlist_items").insert({
+          user_id: userId,
+          product_id: producto.id,
+        });
+
+        if (error) {
+          console.error("Error inserting wishlist item:", error);
+          return;
         }
-        return [...prev, producto];
-      });
+      }
+
+      setItems((prev) => [...prev, producto]);
+      dispatch(
+        addWishlistItem({
+          productId: producto.id,
+          name: producto.name,
+          image: producto.image,
+          price: producto.price,
+        })
+      );
     },
-    [userId]
+    [items, userId, dispatch]
   );
 
   const isInWishlist = useCallback((id: string) => items.some((p) => p.id === id), [items]);
