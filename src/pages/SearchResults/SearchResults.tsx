@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { searchCatalogProducts } from "../../data/searchProducts";
+import { type CatalogProduct } from "../../data/productCatalog";
+import { searchCatalogProductsAsync } from "../../data/searchProducts";
 import "./SearchResults.css";
 
 const suggestedSearches = ["dumbbell", "leggings", "bag", "equipment", "women", "accessories"];
@@ -7,8 +9,41 @@ const suggestedSearches = ["dumbbell", "leggings", "bag", "equipment", "women", 
 function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
-  const results = searchCatalogProducts(query);
+  const [results, setResults] = useState<CatalogProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const hasQuery = query.trim().length > 0;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!hasQuery) {
+      setResults([]);
+      setError("");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    searchCatalogProductsAsync(query)
+      .then((items) => {
+        if (!active) return;
+        setResults(items);
+        setError("");
+      })
+      .catch(() => {
+        if (!active) return;
+        setResults([]);
+        setError("Search is not available right now.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [hasQuery, query]);
 
   return (
     <main className="search-results-page">
@@ -32,12 +67,24 @@ function SearchResults() {
         </section>
       )}
 
-      {hasQuery && results.length === 0 ? (
+      {loading ? (
+        <section className="search-no-results">
+          <h2>Searching products...</h2>
+        </section>
+      ) : null}
+
+      {error ? (
+        <section className="search-no-results">
+          <h2>{error}</h2>
+        </section>
+      ) : null}
+
+      {hasQuery && !loading && !error && results.length === 0 ? (
         <section className="search-no-results">
           <h2>No products found</h2>
           <p>Try a broader word like equipment, women, men, bag, dumbbell, or accessories.</p>
         </section>
-      ) : (
+      ) : !loading && !error ? (
         <section className="search-grid">
           {results.map((product) => (
             <article className="search-card" key={product.id}>
@@ -53,7 +100,7 @@ function SearchResults() {
             </article>
           ))}
         </section>
-      )}
+      ) : null}
     </main>
   );
 }

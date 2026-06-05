@@ -4,7 +4,12 @@ import PageBackButton from "../../components/PageBackButton/PageBackButton";
 import { useCart } from "../../context/CartContext";
 import { catalogProductToWishlist, useWishlist } from "../../context/WishlistContext";
 import { useRequireLogin } from "../../hooks/useRequireLogin";
-import { catalogProducts, relatedCatalogProducts } from "../../data/productCatalog";
+import {
+  fetchCatalogProducts,
+  getCatalogProduct,
+  getRelatedCatalogProducts,
+  type CatalogProduct,
+} from "../../data/productCatalog";
 import { getInitialReviews, type ProductReview } from "../../data/productReviews";
 import "./ProductDetail.css";
 
@@ -46,7 +51,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
+function ProductTile({ product }: { product: CatalogProduct }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const requireLogin = useRequireLogin();
   const liked = isInWishlist(product.id);
@@ -92,10 +97,14 @@ function ProductTile({ product }: { product: typeof catalogProducts[0] }) {
 function ProductDetail() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const product = catalogProducts.find((item) => item.id === productId);
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { addFromCatalog } = useCart();
   const requireLogin = useRequireLogin();
+  const [product, setProduct] = useState<CatalogProduct | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<CatalogProduct[]>([]);
+  const [viewedProducts, setViewedProducts] = useState<CatalogProduct[]>([]);
+  const [loadingProduct, setLoadingProduct] = useState(true);
+  const [productError, setProductError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [question, setQuestion] = useState("");
   const [questionSent, setQuestionSent] = useState(false);
@@ -103,10 +112,60 @@ function ProductDetail() {
   const [reviewTitle, setReviewTitle] = useState("");
   const [reviewBody, setReviewBody] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
-  const [reviews, setReviews] = useState<ProductReview[]>(() =>
-    product ? readProductReviews(product.id) : []
-  );
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!productId) {
+      setProduct(null);
+      setLoadingProduct(false);
+      return;
+    }
+
+    setLoadingProduct(true);
+    setProductError("");
+
+    getCatalogProduct(productId)
+      .then(async (foundProduct) => {
+        if (!active) return;
+        setProduct(foundProduct);
+
+        if (!foundProduct) {
+          setRelatedProducts([]);
+          setViewedProducts([]);
+          return;
+        }
+
+        const [related, allProducts] = await Promise.all([
+          getRelatedCatalogProducts(foundProduct),
+          fetchCatalogProducts(),
+        ]);
+
+        if (!active) return;
+        setRelatedProducts(related);
+        setViewedProducts(
+          allProducts
+            .filter((item) => item.id !== foundProduct.id && item.category === foundProduct.category)
+            .slice(0, 8)
+        );
+      })
+      .catch(() => {
+        if (!active) return;
+        setProduct(null);
+        setRelatedProducts([]);
+        setViewedProducts([]);
+        setProductError("This product is not available right now.");
+      })
+      .finally(() => {
+        if (active) setLoadingProduct(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [productId]);
 
   useEffect(() => {
     if (!product) {
@@ -127,11 +186,6 @@ function ProductDetail() {
     return () => window.clearTimeout(timerId);
   }, [showAddedToCart]);
 
-  const relatedProducts = relatedCatalogProducts.filter((item) => item.id !== product?.id).slice(0, 8);
-  const viewedProducts = catalogProducts
-    .filter((item) => item.id !== product?.id && item.category === product?.category)
-    .slice(0, 8);
-
   const averageRating = useMemo(() => {
     if (reviews.length === 0) {
       return 0;
@@ -140,12 +194,21 @@ function ProductDetail() {
     return reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
   }, [reviews]);
 
+  if (loadingProduct) {
+    return (
+      <main className="product-detail-page page-workspace">
+        <p className="page-kicker">PeakFit product</p>
+        <h1>Loading product...</h1>
+      </main>
+    );
+  }
+
   if (!product) {
     return (
       <main className="product-detail-page page-workspace">
         <p className="page-kicker">PeakFit product</p>
         <h1>Product not found</h1>
-        <p>This product is not available in the catalog.</p>
+        <p>{productError || "This product is not available in the catalog."}</p>
         <Link className="page-action" to="/home">
           Back to shop
         </Link>
