@@ -18,10 +18,10 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
-    const ok = login(email, password);
+   const ok = await login(email, password);
     if (ok) {
       const from = locationState?.from;
       const target =
