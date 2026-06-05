@@ -101,8 +101,14 @@ function AppRouter() {
           <Route path="/cart" element={<ShoppingCart />} />
           <Route path="/seller-product" element={<SellerProduct />} />
           <Route path="/seller-product/new" element={<CreateSellerProduct />} />
-          <Route path="/create-seller-product" element={<CreateSellerProduct />} />
-          <Route path="/create-seller-product/:id" element={<CreateSellerProduct />} />
+          <Route
+            path="/create-seller-product"
+            element={<CreateSellerProduct />}
+          />
+          <Route
+            path="/create-seller-product/:id"
+            element={<CreateSellerProduct />}
+          />
         </Route>
       </Route>
 
