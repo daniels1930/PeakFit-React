@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { formatUsd } from "../../utils/price";
+import { supabase } from "../../lib/supabase";
 import "./PayPage.css";
 
 type ShippingForm = {
@@ -39,9 +40,7 @@ function PayPage() {
   const { lines, subtotal, clearCart } = useCart();
   const [step, setStep] = useState<1 | 2>(1);
   const [shipping, setShipping] = useState<ShippingForm>(initialShipping);
-  const [shippingErrors, setShippingErrors] = useState<Errors<ShippingForm>>(
-    {},
-  );
+  const [shippingErrors, setShippingErrors] = useState<Errors<ShippingForm>>({});
 
   const [confirmed, setConfirmed] = useState(false);
   const [confirmError, setConfirmError] = useState<string>("");
@@ -120,7 +119,7 @@ function PayPage() {
     setStep(1);
   }
 
-  function handleConfirmPurchase() {
+  async function handleConfirmPurchase() {
     setConfirmError("");
     if (!confirmed) {
       setConfirmError("Please confirm to continue");
@@ -128,6 +127,34 @@ function PayPage() {
     }
 
     const paidTotal = summary.total;
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+
+    if (userId) {
+      const { data: order } = await supabase
+        .from("orders")
+        .insert({
+          user_id: userId,
+          total: paidTotal,
+          status: "paid",
+          shipping_address: `${shipping.address1}, ${shipping.city}, ${shipping.country}`,
+        })
+        .select()
+        .single();
+
+      if (order) {
+        const orderItems = summary.items.map((item) => ({
+          order_id: order.id,
+          product_id: item.id,
+          name: item.name,
+          quantity: item.qty,
+          unit_price: item.lineTotal / item.qty,
+        }));
+        await supabase.from("order_items").insert(orderItems);
+      }
+    }
+
     setPaid(true);
     clearCart();
     navigate("/payment-success", {
@@ -316,18 +343,14 @@ function PayPage() {
                       <div key={it.id} className="summary__row">
                         <div>
                           <div className="summary__name">{it.name}</div>
-                          <div className="summary__meta">
-                            Qty: {it.qty}
-                          </div>
+                          <div className="summary__meta">Qty: {it.qty}</div>
                         </div>
                         <div className="summary__price">{formatUsd(it.lineTotal)}</div>
                       </div>
                     ))}
                     <div className="summary__row total">
                       <div className="summary__name">Total</div>
-                      <div className="summary__price">
-                        {formatUsd(summary.total)}
-                      </div>
+                      <div className="summary__price">{formatUsd(summary.total)}</div>
                     </div>
                   </div>
                 </div>
@@ -389,4 +412,5 @@ function PayPage() {
     </main>
   );
 }
+
 export default PayPage;
