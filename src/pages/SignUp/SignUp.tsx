@@ -11,10 +11,10 @@ function SignUp() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
-    const ok = register(name, email, password);
+    const ok = await register(name, email, password);
     if (ok) {
       navigate("/login", { replace: true });
     } else {
