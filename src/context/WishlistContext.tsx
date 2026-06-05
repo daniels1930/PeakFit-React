@@ -2,10 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { supabase } from "../lib/supabase";
 
 export type WishlistProduct = {
   id: string;
@@ -24,16 +26,69 @@ const WishlistContext = createContext<WishlistContextType | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<WishlistProduct[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const toggleWishlist = useCallback((producto: WishlistProduct) => {
-    setItems((prev) => {
-      const exists = prev.some((p) => p.id === producto.id);
-      if (exists) {
-        return prev.filter((p) => p.id !== producto.id);
-      }
-      return [...prev, producto];
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id ?? null);
     });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => listener.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!userId) {
+      setItems([]);
+      return;
+    }
+    supabase
+      .from("wishlist_items")
+      .select("*")
+      .eq("user_id", userId)
+      .then(({ data }) => {
+        if (data) {
+          setItems(
+            data.map((row) => ({
+              id: row.product_id,
+              name: row.name,
+              image: row.image,
+              price: row.price,
+            }))
+          );
+        }
+      });
+  }, [userId]);
+
+  const toggleWishlist = useCallback(
+    (producto: WishlistProduct) => {
+      setItems((prev) => {
+        const exists = prev.some((p) => p.id === producto.id);
+        if (exists) {
+          if (userId) {
+            supabase
+              .from("wishlist_items")
+              .delete()
+              .eq("user_id", userId)
+              .eq("product_id", producto.id);
+          }
+          return prev.filter((p) => p.id !== producto.id);
+        }
+        if (userId) {
+          supabase.from("wishlist_items").insert({
+            user_id: userId,
+            product_id: producto.id,
+            name: producto.name,
+            image: producto.image,
+            price: producto.price,
+          });
+        }
+        return [...prev, producto];
+      });
+    },
+    [userId]
+  );
 
   const isInWishlist = useCallback(
     (id: string) => items.some((p) => p.id === id),
@@ -41,11 +96,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({
-      items,
-      toggleWishlist,
-      isInWishlist,
-    }),
+    () => ({ items, toggleWishlist, isInWishlist }),
     [items, toggleWishlist, isInWishlist]
   );
 
